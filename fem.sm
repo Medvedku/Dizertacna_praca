@@ -4,7 +4,7 @@
   <settings ppi="96">
     <identity>
       <id>431a8969-ab5b-4941-a950-f29e4d65c57c</id>
-      <revision>4</revision>
+      <revision>5</revision>
     </identity>
     <calculation>
       <precision>4</precision>
@@ -882,6 +882,133 @@
           <e type="operand">4</e>
           <e type="operand">1</e>
           <e type="function" args="6">mat</e>
+        </result>
+      </math>
+    </region>
+    <region left="0" top="1215" width="416" height="82" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">D</e>
+          <e type="operand">1</e>
+          <e type="operand">μ</e>
+          <e type="operand">0</e>
+          <e type="operand">μ</e>
+          <e type="operand">1</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">1</e>
+          <e type="operand">μ</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">3</e>
+          <e type="operand">3</e>
+          <e type="function" args="11">mat</e>
+          <e type="operator" args="2">*</e>
+        </input>
+        <contract>
+          <e type="operand" style="unit">kN</e>
+          <e type="operand" style="unit">m</e>
+          <e type="operator" args="2">*</e>
+        </contract>
+        <result action="numeric">
+          <e type="operand">8888.8889</e>
+          <e type="operand">2222.2222</e>
+          <e type="operand">0</e>
+          <e type="operand">2222.2222</e>
+          <e type="operand">8888.8889</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">3333.3333</e>
+          <e type="operand">3</e>
+          <e type="operand">3</e>
+          <e type="function" args="11">mat</e>
+        </result>
+      </math>
+    </region>
+    <region left="0" top="1323" width="438" height="65" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">D</e>
+          <e type="operand">1</e>
+          <e type="operand">μ</e>
+          <e type="operand">0</e>
+          <e type="operand">μ</e>
+          <e type="operand">1</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">2</e>
+          <e type="operand">1</e>
+          <e type="operand">μ</e>
+          <e type="operator" args="2">+</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">3</e>
+          <e type="operand">3</e>
+          <e type="function" args="11">mat</e>
+          <e type="operator" args="2">*</e>
+        </input>
+        <contract>
+          <e type="operand" style="unit">kN</e>
+          <e type="operand" style="unit">m</e>
+          <e type="operator" args="2">*</e>
+        </contract>
+        <result action="numeric">
+          <e type="operand">8888.8889</e>
+          <e type="operand">2222.2222</e>
+          <e type="operand">0</e>
+          <e type="operand">2222.2222</e>
+          <e type="operand">8888.8889</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">22222.2222</e>
+          <e type="operand">3</e>
+          <e type="operand">3</e>
+          <e type="function" args="11">mat</e>
+        </result>
+      </math>
+    </region>
+    <region left="0" top="1476" width="134" height="34" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">x</e>
+          <e type="operand">y</e>
+          <e type="function" args="2">f</e>
+          <e type="operand">x</e>
+          <e type="operand">4</e>
+          <e type="operator" args="2">^</e>
+          <e type="operand">y</e>
+          <e type="operand">3</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="18" top="1548" width="226" height="69" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">x</e>
+          <e type="operand">y</e>
+          <e type="function" args="2">f</e>
+          <e type="operand">x</e>
+          <e type="operand">1</e>
+          <e type="operator" args="1">-</e>
+          <e type="operand">2</e>
+          <e type="function" args="4">int</e>
+          <e type="operand">y</e>
+          <e type="operand">3</e>
+          <e type="operator" args="1">-</e>
+          <e type="operand">4</e>
+          <e type="function" args="4">int</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">288.75</e>
         </result>
       </math>
     </region>
