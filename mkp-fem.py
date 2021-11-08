@@ -52,10 +52,10 @@ for i in range(len(N)):
 for i in range( len(N) ):
     for j in range( len(N) ):
         pass
-        K[i][j] = K[i][j] + integrate( integrate(
-        D[0][0]*N_x[i]*N_x[j] + D[1][1]*N_y[i]*N_y[j] +
-        D[0][1]*( N_x[i]*N_y[j] + N_y[i]*N_x[j] ) +
-        4*D[2][2]*N_xy[i]*N_xy[j], (x, -a, a) ), (y, -b, b) )
+        # K[i][j] = K[i][j] + integrate( integrate(
+        # D[0][0]*N_x[i]*N_x[j] + D[1][1]*N_y[i]*N_y[j] +
+        # D[0][1]*( N_x[i]*N_y[j] + N_y[i]*N_x[j] ) +
+        # 4*D[2][2]*N_xy[i]*N_xy[j], (x, -a, a) ), (y, -b, b) )
     F[i] = integrate( integrate( p*N[i] , (x, -a, a) ), (y, -b, b) )
 
 delta = np.linalg.inv(K)
