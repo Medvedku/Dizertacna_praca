@@ -5,108 +5,6 @@ import sys
 
 np.set_printoptions(precision=1)
 
-# E  = 210 * 1e9
-# mi = 0.3
-# h  = 0.01
-# p  = 1000
-# a  = 0.5
-# b  = 0.5
-#
-# D = E*h**3 / (12*(1-mi**2))
-#
-# K_e = [0 for i in range(4)]
-#
-# K_e[0] = b/(6*(a**3)) * np.array([
-# [6,     0,      0,   0,     0,     0,  0,   0,     0,  0,   0,     0],
-# [6*a,   8*a*a,  0,   0,     0,     0,  0,   0,     0,  0,   0,     0],
-# [0,     0,      0,   0,     0,     0,  0,   0,     0,  0,   0,     0],
-# [-6,   -6*a,    0,   6,     0,     0,  0,   0,     0,  0,   0,     0],
-# [ 6*a,  4*a*a,  0,  -6*a,   8*a*a, 0,  0,   0,     0,  0,   0,     0],
-# [ 0,    0,      0,   0,     0,     0,  0,   0,     0,  0,   0,     0],
-# [-3,   -3*a,    0,   3,    -3*a,   0,  6,   0,     0,  0,   0,     0],
-# [ 3*a,  2*a*a,  0,  -3*a,   4*a*a, 0, -6*a, 8*a*a, 0,  0,   0,     0],
-# [ 0,    0,      0,   0,     0,     0,  0,   0,     0,  0,   0,     0],
-# [3,     3*a,    0,  -3,     3*a,   0, -6,   6*a,   0,  6,   0,     0],
-# [3*a,   4*a*a,  0,  -3*a,   2*a*a, 0, -6*a, 4*a*a, 0,  6*a, 8*a*a, 0],
-# [0,     0,      0,   0,     0,     0,  0,   0,     0,  0,   0,     0],
-# ])
-#
-# K_e[1] = a/(6*(b**3)) * np.array([
-# [6,     0,      0,      0,     0,   0,      0,   0,     0,      0,   0,   0],
-# [0,     0,      0,      0,     0,   0,      0,   0,     0,      0,   0,   0],
-# [6*b,   0,      8*b*b,  0,     0,   0,      0,   0,     0,      0,   0,   0],
-# [3,     0,      3*b,    6,     0,   0,      0,   0,     0,      0,   0,   0],
-# [0,     0,      0,      0,     0,   0,      0,   0,     0,      0,   0,   0],
-# [3*b,   0,      4*b*b,  6*b,   0,   8*b*b,  0,   0,     0,      0,   0,   0],
-# [-3,    0,     -3*b,   -6,     0,  -6*b,    6,   0,     0,      0,   0,   0],
-# [ 0,    0,      0,      0,     0,   0,      0,   0,     0,      0,   0,   0],
-# [ 3*b,  0,      2*b*b,  6*b,   0,   4*b*b, -6*b, 0,     8*b*b,  0,   0,   0],
-# [-6,    0,     -6*b,   -3,     0,  -3*b,    3,   0,    -3*b,    6,   0,   0],
-# [ 0,    0,      0,      0,     0,   0,      0,   0,     0,      0,   0,   0],
-# [ 6*b,  0,      4*b*b,  3*b,   0,   2*b*b, -3*b, 0,     4*b*b, -6*b, 0,   8*b*b],
-# ])
-#
-# K_e[2] = mi/(2*a*b) * np.array([
-# [1,     0,      0,      0,     0,     0,      0,   0,     0,    0,   0,     0],
-# [a,     0,      0,      0,     0,     0,      0,   0,     0,    0,   0,     0],
-# [b,     2*a*b,  0,      0,     0,     0,      0,   0,     0,    0,   0,     0],
-# [-1,    0,     -b,      1,     0,     0,      0,   0,     0,    0,   0,     0],
-# [ 0,    0,      0,     -a,     0,     0,      0,   0,     0,    0,   0,     0],
-# [-b,    0,      0,      b,    -2*a*b, 0,      0,   0,     0,    0,   0,     0],
-# [1,     0,      0,     -1,     a,     0,      1,   0,     0,    0,   0,     0],
-# [0,     0,      0,      a,     0,     0,     -a,   0,     0,    0,   0,     0],
-# [0,     0,      0,      0,     0,     0,     -b,   2*a*b, 0,    0,   0,     0],
-# [-1,   -a,      0,      1,     0,     0,     -1,   0,     b,    1,   0,     0],
-# [-a,    0,      0,      0,     0,     0,      0,   0,     0,    a,   0,     0],
-# [ 0,    0,      0,      0,     0,     0,      0,   0,     0,   -b,  -2*a*b, 0],
-# ])
-#
-# K_e[3] = (1-mi)/(30*a*b) * np.array([
-# [21,     0,      0,      0,      0,      0,      0,    0,      0,      0,    0,     0],
-# [3*a,    8*a*a,  0,      0,      0,      0,      0,    0,      0,      0,    0,     0],
-# [3*b,    0,      8*b*b,  0,      0,      0,      0,    0,      0,      0,    0,     0],
-# [-21,   -3*a,   -3*b,    21,     0,      0,      0,    0,      0,      0,    0,     0],
-# [ 3*a,  -2*a*a,  0,     -3*a,    8*a*a,  0,      0,    0,      0,      0,    0,     0],
-# [-3*b,   0,     -8*b*b,  3*b,    0,      8*b*b,  0,    0,      0,      0,    0,     0],
-# [ 21,    3*a,    3*b,   -21,     3*a,   -3*b,    21,   0,      0,      0,    0,     0],
-# [-3*a,   2*a*a,  0,      3*a,   -8*a*a,  0,     -3*a,  8*a*a,  0,      0,    0,     0],
-# [-3*b,   0,      2*b*b,  3*b,    0,     -2*b*b, -3*b,  0,      8*b*b,  0,    0,     0],
-# [-21,   -3*a,   -3*b,    21,    -3*a,    3*b,   -21,   3*a,    3*b,    21,   0,     0],
-# [-3*a,  -2*a*a,  0,      3*a,    2*a*a,  0,     -3*a, -2*a*a,  0,      3*a,  8*a*a, 0],
-# [ 3*b,   0,     -8*b*b, -3*b,    0,      2*b*b,  3*b,  0,     -8*b*b, -3*b,  0,     8*b*b],
-# ])
-#
-# # apply symetry
-# for k in K_e:
-#     for i in range(12):
-#         for j in range(12):
-#             if j < i:
-#                 pass
-#             else:
-#                 k[i][j] = k[j][i]
-#
-# # definition: stiffness matrix of element
-# K_elem = D * (K_e[0] + K_e[1] + K_e[2] + K_e[3])
-#
-# F = [0 for i in range(12)]
-# F[0] = 1000
-#
-# indexes = [i for i in range(12)]
-#
-# deleto = [3,6,7,8,9]
-#
-# K_elem  = np.delete(K_elem, deleto, axis = 0)
-# K_elem  = np.delete(K_elem, deleto, axis = 1)
-# F       = np.delete(F, deleto, axis = 0)
-# indexes = np.delete(indexes, deleto, axis = 0)
-#
-# delta   = np.linalg.inv(K_elem)
-#
-# r_tot   = np.matmul(delta, F)
-
-# for i in range(len(r_tot)):
-#     print(indexes[i], r_tot[i])
-
 spiel = True
 
 class Node:
@@ -286,8 +184,8 @@ class Element:
 LX = 3
 LY = 5
 
-nx = 30
-ny = 40
+nx = 4
+ny = 6
 
 coor_x = [0+i*(LX/nx) for i in range(nx+1)]
 coor_y = [0+i*(LY/ny) for i in range(ny+1)]
@@ -321,21 +219,22 @@ for i in range(ny):
         l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.01) )
 
 # Assembly of Global stiffness B_matrix
-
-n         = l_elems[-1].el_id + 1
+n_e       = l_elems[-1].el_id + 1
+n_n       = l_nodes[-1].nd_id + 1
 dofs      = l_nodes[-1].fi_y+1
 code_nums = list(range(dofs))
 
 K_gl = np.zeros( (dofs, dofs) )
 
+
 cunt = 0
-step = 0
-c_spiel = [i*((dofs*dofs)//10) for i in range(10)]
-print(c_spiel)
+step = 10
+c_spiel = [i*((n_e*12*12)//10) for i in range(10)]
+
 for i in l_elems:
     K_temp = np.zeros( (dofs, dofs) )
-    for j in range(4):
-        for k in range(4):
+    for j in range(12):                 # because element matrix is 12x12 shape
+        for k in range(12):             # because element matrix is 12x12 shape
             K_temp[i.vec[j],i.vec[k]] = i.k_el[j,k]
             if spiel:
                 if cunt in c_spiel:
@@ -344,6 +243,11 @@ for i in l_elems:
             cunt += 1
 
     K_gl += K_temp
+
+delta = np.linalg.inv(K_gl)
+
+np.savetxt("fnam3e.csv", K_gl, delimiter=',', fmt='%.0f')
+np.savetxt("inv.txt", delta, delimiter=',', fmt='%.1e')
 
 # print(n)
 # print(dofs)
