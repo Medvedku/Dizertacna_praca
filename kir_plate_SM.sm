@@ -4,7 +4,7 @@
   <settings ppi="96">
     <identity>
       <id>8f174acb-2330-471d-b0c5-318b29841169</id>
-      <revision>3</revision>
+      <revision>4</revision>
     </identity>
     <calculation>
       <precision>4</precision>
@@ -1500,7 +1500,7 @@
         </input>
       </math>
     </region>
-    <region left="0" top="2466" width="774" height="226" color="#000000" fontSize="10">
+    <region left="0" top="2520" width="699" height="204" color="#000000" fontSize="9">
       <math decimalPlaces="0" exponentialThreshold="7" matrixOptions="0,0,12,12">
         <input>
           <e type="operand">K.prvé</e>
@@ -1703,377 +1703,162 @@
         </result>
       </math>
     </region>
-    <region left="0" top="3213" width="731" height="173" color="#000000" fontSize="10">
+    <region left="0" top="2745" width="768" height="270" color="#000000" fontSize="16">
       <math>
         <input>
-          <e type="operand">mat</e>
-          <e type="operand">row</e>
-          <e type="function" args="2">rmRow</e>
-          <e type="operand">c</e>
-          <e type="operand">mat</e>
-          <e type="function" args="1">cols</e>
-          <e type="operator" args="2">:</e>
-          <e type="operand">r</e>
-          <e type="operand">mat</e>
-          <e type="function" args="1">rows</e>
-          <e type="operator" args="2">:</e>
-          <e type="operand">row</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">≡</e>
-          <e type="operand">mat</e>
-          <e type="operand">row</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">+</e>
-          <e type="operand">r</e>
-          <e type="operand">1</e>
-          <e type="operand">c</e>
-          <e type="function" args="5">submatrix</e>
-          <e type="operand">row</e>
-          <e type="operand">r</e>
-          <e type="operator" args="2">≡</e>
-          <e type="operand">mat</e>
-          <e type="operand">1</e>
-          <e type="operand">row</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">-</e>
-          <e type="operand">1</e>
-          <e type="operand">c</e>
-          <e type="function" args="5">submatrix</e>
-          <e type="operand">mat</e>
-          <e type="operand">1</e>
-          <e type="operand">row</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">-</e>
-          <e type="operand">1</e>
-          <e type="operand">c</e>
-          <e type="function" args="5">submatrix</e>
-          <e type="operand">mat</e>
-          <e type="operand">row</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">+</e>
-          <e type="operand">r</e>
-          <e type="operand">1</e>
-          <e type="operand">c</e>
-          <e type="function" args="5">submatrix</e>
-          <e type="function" args="2">stack</e>
-          <e type="function" args="3">if</e>
-          <e type="function" args="3">if</e>
-          <e type="operand">3</e>
-          <e type="operand">1</e>
-          <e type="function" args="5">line</e>
-          <e type="operator" args="2">:</e>
-        </input>
-      </math>
-    </region>
-    <region left="0" top="3393" width="729" height="173" color="#000000" fontSize="10">
-      <math>
-        <input>
-          <e type="operand">mat</e>
-          <e type="operand">col</e>
-          <e type="function" args="2">rmCol</e>
-          <e type="operand">c</e>
-          <e type="operand">mat</e>
-          <e type="function" args="1">cols</e>
-          <e type="operator" args="2">:</e>
-          <e type="operand">r</e>
-          <e type="operand">mat</e>
-          <e type="function" args="1">rows</e>
-          <e type="operator" args="2">:</e>
-          <e type="operand">col</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">≡</e>
-          <e type="operand">mat</e>
-          <e type="operand">1</e>
-          <e type="operand">r</e>
-          <e type="operand">col</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">+</e>
-          <e type="operand">c</e>
-          <e type="function" args="5">submatrix</e>
-          <e type="operand">col</e>
-          <e type="operand">c</e>
-          <e type="operator" args="2">≡</e>
-          <e type="operand">mat</e>
-          <e type="operand">1</e>
-          <e type="operand">r</e>
-          <e type="operand">1</e>
-          <e type="operand">col</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">-</e>
-          <e type="function" args="5">submatrix</e>
-          <e type="operand">mat</e>
-          <e type="operand">1</e>
-          <e type="operand">r</e>
-          <e type="operand">1</e>
-          <e type="operand">col</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">-</e>
-          <e type="function" args="5">submatrix</e>
-          <e type="operand">mat</e>
-          <e type="operand">1</e>
-          <e type="operand">r</e>
-          <e type="operand">1</e>
-          <e type="operand">col</e>
-          <e type="operand">1</e>
-          <e type="operator" args="2">+</e>
-          <e type="function" args="5">submatrix</e>
-          <e type="function" args="2">stack</e>
-          <e type="function" args="3">if</e>
-          <e type="function" args="3">if</e>
-          <e type="operand">3</e>
-          <e type="operand">1</e>
-          <e type="function" args="5">line</e>
-          <e type="operator" args="2">:</e>
-        </input>
-      </math>
-    </region>
-    <region left="0" top="3573" width="168" height="125" color="#000000" fontSize="16">
-      <math>
-        <input>
-          <e type="operand">M</e>
-          <e type="operand">1</e>
-          <e type="operand">2</e>
-          <e type="operand">3</e>
-          <e type="operand">4</e>
-          <e type="operand">5</e>
-          <e type="operand">6</e>
-          <e type="operand">7</e>
-          <e type="operand">8</e>
+          <e type="operand">K</e>
+          <e type="operand">203077</e>
+          <e type="operand">46923</e>
+          <e type="operand">46923</e>
+          <e type="operand">41154</e>
+          <e type="operand">10769</e>
+          <e type="operand">16538</e>
+          <e type="operand">16538</e>
+          <e type="operand">10769</e>
+          <e type="operand">41154</e>
+          <e type="operand">46923</e>
+          <e type="operand">29231</e>
+          <e type="operand">5769</e>
+          <e type="operand">11923</e>
+          <e type="operand">0</e>
+          <e type="operand">7308</e>
+          <e type="operand">0</e>
+          <e type="operand">11923</e>
+          <e type="operand">0</e>
+          <e type="operand">46923</e>
+          <e type="operand">5769</e>
+          <e type="operand">29231</e>
+          <e type="operand">0</e>
+          <e type="operand">9231</e>
+          <e type="operand">0</e>
+          <e type="operand">7308</e>
+          <e type="operand">0</e>
+          <e type="operand">16410</e>
+          <e type="operand">41154</e>
+          <e type="operand">11923</e>
+          <e type="operand">0</e>
+          <e type="operand">29231</e>
+          <e type="operand">5769</e>
+          <e type="operator" args="1">-</e>
+          <e type="operand">9231</e>
+          <e type="operand">0</e>
+          <e type="operand">7308</e>
+          <e type="operand">0</e>
+          <e type="operand">10769</e>
+          <e type="operand">0</e>
+          <e type="operand">9231</e>
+          <e type="operand">5769</e>
+          <e type="operator" args="1">-</e>
+          <e type="operand">29231</e>
+          <e type="operand">0</e>
+          <e type="operand">11923</e>
+          <e type="operand">0</e>
+          <e type="operand">7308</e>
+          <e type="operand">16538</e>
+          <e type="operand">7308</e>
+          <e type="operand">0</e>
+          <e type="operand">9231</e>
+          <e type="operand">0</e>
+          <e type="operand">29231</e>
+          <e type="operand">5769</e>
+          <e type="operand">11923</e>
+          <e type="operand">0</e>
+          <e type="operand">16538</e>
+          <e type="operand">0</e>
+          <e type="operand">7308</e>
+          <e type="operand">0</e>
+          <e type="operand">11923</e>
+          <e type="operand">5769</e>
+          <e type="operand">29231</e>
+          <e type="operand">0</e>
+          <e type="operand">9231</e>
+          <e type="operand">10769</e>
+          <e type="operand">11923</e>
+          <e type="operand">0</e>
+          <e type="operand">7308</e>
+          <e type="operand">0</e>
+          <e type="operand">11923</e>
+          <e type="operand">0</e>
+          <e type="operand">29231</e>
+          <e type="operand">5769</e>
+          <e type="operator" args="1">-</e>
+          <e type="operand">41154</e>
+          <e type="operand">0</e>
+          <e type="operand">16410</e>
+          <e type="operand">0</e>
+          <e type="operand">7308</e>
+          <e type="operand">0</e>
+          <e type="operand">9231</e>
+          <e type="operand">5769</e>
+          <e type="operator" args="1">-</e>
+          <e type="operand">29231</e>
           <e type="operand">9</e>
-          <e type="operand">10</e>
-          <e type="operand">11</e>
-          <e type="operand">12</e>
-          <e type="operand">4</e>
-          <e type="operand">3</e>
-          <e type="function" args="14">mat</e>
+          <e type="operand">9</e>
+          <e type="function" args="83">mat</e>
           <e type="operator" args="2">:</e>
         </input>
       </math>
     </region>
-    <region left="0" top="3663" width="662" height="248" color="#000000" fontSize="12">
-      <math decimalPlaces="0" exponentialThreshold="2" matrixOptions="0,0,12,11">
+    <region left="0" top="3231" width="106" height="52" color="#000000" fontSize="16">
+      <math>
         <input>
-          <e type="operand">K.gl.1r</e>
-          <e type="operand">K.prvé</e>
-          <e type="operand">4</e>
-          <e type="function" args="2">rmRow</e>
-          <e type="operator" args="2">:</e>
-        </input>
-        <contract>
-          <e type="operand">10</e>
-          <e type="operand">4</e>
+          <e type="operand">δ</e>
+          <e type="operand">K</e>
+          <e type="operand">1</e>
+          <e type="operator" args="1">-</e>
           <e type="operator" args="2">^</e>
-        </contract>
-        <result action="numeric">
-          <e type="operand">20</e>
-          <e type="operand">5</e>
-          <e type="operand">5</e>
-          <e type="operand">9</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">4</e>
-          <e type="operand">1</e>
-          <e type="operand">3</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">2</e>
-          <e type="operand">2</e>
-          <e type="operand">9</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">4</e>
-          <e type="operand">5</e>
-          <e type="operand">3</e>
-          <e type="operand">1</e>
-          <e type="operand">4</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">2</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">5</e>
-          <e type="operand">1</e>
-          <e type="operand">3</e>
-          <e type="operand">2</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">2</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">4</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">0</e>
-          <e type="operand">2</e>
-          <e type="operand">4</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">5</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">3</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">2</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">5</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">3</e>
-          <e type="operand">4</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">2</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">3</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">2</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">2</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">9</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">4</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">20</e>
-          <e type="operand">5</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">5</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">9</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">4</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">2</e>
-          <e type="operand">2</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">5</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">3</e>
-          <e type="operand">1</e>
-          <e type="operand">4</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">2</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">4</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">5</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">3</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">9</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">4</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">3</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">2</e>
-          <e type="operand">2</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">9</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">4</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">20</e>
-          <e type="operand">5</e>
-          <e type="operand">5</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">2</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">4</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operand">0</e>
-          <e type="operand">5</e>
-          <e type="operand">3</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">4</e>
-          <e type="operand">0</e>
-          <e type="operand">2</e>
-          <e type="operand">2</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">2</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">0</e>
-          <e type="operand">1</e>
-          <e type="operand">5</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">1</e>
-          <e type="operator" args="1">-</e>
-          <e type="operand">3</e>
-          <e type="operand">11</e>
-          <e type="operand">12</e>
-          <e type="function" args="134">mat</e>
-        </result>
-      </math>
-    </region>
-    <region left="0" top="3942" width="287" height="47" color="#000000" fontSize="12">
-      <math error="24" decimalPlaces="0" exponentialThreshold="2" matrixOptions="0,0,12,11">
-        <input>
-          <e type="operand">K.gl.1c</e>
-          <e type="operand">K.gl.1r</e>
-          <e type="operand">4</e>
-          <e type="function" args="2">rmCol</e>
           <e type="operator" args="2">:</e>
         </input>
-        <contract>
-          <e type="operand">10</e>
-          <e type="operand">4</e>
-          <e type="operator" args="2">^</e>
-        </contract>
+      </math>
+    </region>
+    <region left="9" top="3339" width="285" height="58" color="#000000" fontSize="16">
+      <math>
+        <input>
+          <e type="operand">F</e>
+          <e type="operand">1</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">0</e>
+          <e type="operand">1</e>
+          <e type="operand">9</e>
+          <e type="function" args="11">mat</e>
+          <e type="function" args="1">transpose</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="0" top="3564" width="275" height="289" color="#000000" fontSize="16">
+      <math>
+        <input>
+          <e type="operand">r</e>
+          <e type="operand">K</e>
+          <e type="operand">F</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
         <result action="numeric">
-          <e type="operand">#</e>
+          <e type="operand">2.0308</e>
+          <e type="operand">10</e>
+          <e type="operand">5</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">46923</e>
+          <e type="operand">46923</e>
+          <e type="operand">41154</e>
+          <e type="operand">10769</e>
+          <e type="operand">16538</e>
+          <e type="operand">16538</e>
+          <e type="operand">10769</e>
+          <e type="operand">41154</e>
+          <e type="operand">9</e>
+          <e type="operand">1</e>
+          <e type="function" args="11">mat</e>
         </result>
-      </math>
-    </region>
-    <region left="432" top="3996" width="77" height="33" color="#000000" fontSize="16">
-      <math>
-        <input>
-          <e type="operand">stack</e>
-        </input>
-      </math>
-    </region>
-    <region left="207" top="4032" width="64" height="33" color="#000000" fontSize="16">
-      <math>
-        <input>
-          <e type="operand">conc</e>
-        </input>
       </math>
     </region>
   </regions>
