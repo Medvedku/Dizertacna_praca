@@ -3,7 +3,7 @@ import numpy as np
 from sympy import *
 import sys
 
-np.set_printoptions(precision=1)
+np.set_printoptions(precision=15)
 
 spiel = True
 
@@ -181,16 +181,16 @@ class Element:
 
 # Definition of construction
 
-LX = 3
-LY = 5
+LX = 1
+LY = 1
 
-nx = 4
-ny = 6
+nx = 2
+ny = 2
 
 coor_x = [0+i*(LX/nx) for i in range(nx+1)]
 coor_y = [0+i*(LY/ny) for i in range(ny+1)]
 
-
+print(coor_x, coor_y)
 # ### Nasledujúce dva riadky zmazať po teste
 # coor_x = [0.0, 0.5, 1.5, 3.0]
 # coor_y = [0.0, 0.5, 1.5, 3.0, 5.0]
@@ -223,6 +223,8 @@ n_e       = l_elems[-1].el_id + 1
 n_n       = l_nodes[-1].nd_id + 1
 dofs      = l_nodes[-1].fi_y+1
 code_nums = list(range(dofs))
+load      = [0 for i in range(dofs)]
+load[0]   = 1
 
 K_gl = np.zeros( (dofs, dofs) )
 
@@ -244,12 +246,22 @@ for i in l_elems:
 
     K_gl += K_temp
 
+### Supports in corners of slab
+boundary = []
+for i in l_nodes:
+    if i.co_x == 0 and i.co_y == LY:
+        boundary.append(i.w)
+    if i.co_x == LX and i.co_y == 0:
+        boundary.append(i.w)
+    if i.co_x == LX and i.co_y == LY:
+        boundary.append(i.w)
+print(boundary)
+deleto = boundary
+K_gl = np.delete(K_gl, deleto, axis = 0)
+K_gl = np.delete(K_gl, deleto, axis = 1)
+load = np.delete(load, deleto, axis = 0)
+code_nums = np.delete(code_nums, deleto, axis = 0)
+
 delta = np.linalg.inv(K_gl)
 
-np.savetxt("fnam3e.csv", K_gl, delimiter=',', fmt='%.0f')
-np.savetxt("inv.txt", delta, delimiter=',', fmt='%.1e')
-
-# print(n)
-# print(dofs)
-# print(code_nums)
-# print(K_gl)
+r_tot = np.matmul(K_gl, load)
