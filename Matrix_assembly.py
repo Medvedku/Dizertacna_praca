@@ -185,26 +185,6 @@ class Element:
 
         return K_elem
 
-# Definition of construction
-
-# N0 = Node( 0.0, 0.0 )
-# N1 = Node( 0.5, 0.0 )
-# N2 = Node( 1.0, 0.0 )
-# N3 = Node( 0.0, 1.0 )
-# N4 = Node( 0.5, 1.0 )
-# N5 = Node( 1.0, 1.0 )
-#
-# l_nodes = [N0, N1, N2, N3, N4, N5]
-#
-#
-# l_elems = []
-#
-#
-# E0_ = Element(N3, N4, N0, N1, h = 0.01)
-# E1_ = Element(N4, N5, N1, N2, h = 0.01)
-#
-# l_elems = [E0_, E1_]
-
 LX = 1
 LY = 1
 
