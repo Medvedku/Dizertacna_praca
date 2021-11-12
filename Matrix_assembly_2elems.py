@@ -9,7 +9,7 @@ from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import inv
 
 
-np.set_printoptions(precision=15)
+np.set_printoptions(precision=5)
 
 spiel = True
 
@@ -185,57 +185,49 @@ class Element:
 
         return K_elem
 
-# Definition of construction
-
 LX = 1
 LY = 1
 
-nx = 3
-ny = 3
+N0 = Node( 0.0,   0.0 )
+N1 = Node( LX/2,  0.0 )
+N2 = Node( LX,    0.0 )
+N3 = Node( 0.0,   LY )
+N4 = Node( LX/2,  LY )
+N5 = Node( LX,    LY )
 
-coor_x = [0+i*(LX/nx) for i in range(nx+1)]
-coor_y = [0+i*(LY/ny) for i in range(ny+1)]
+E0_ = Element(N3, N4, N1, N0, h = 0.01, E = 200000000000 )
+E1_ = Element(N4, N5, N2, N1, h = 0.01, E = 200000000000 )
 
+l_elems = [E0_, E1_]
 
-Nodes_ = np.empty( (ny+1, nx+1), dtype = "int" )
-cunt = 0
-for i in range(ny+1):
-    for j in range(nx+1):
-        Nodes_[i][j] = cunt
-        cunt += 1
-print(Nodes_)
-l_nodes = []
-for i in range(ny+1):
-    for j in range(nx+1):
-        x_coor = coor_x[j]
-        y_coor = coor_y[i]
-        l_nodes.append(Node(x_coor,y_coor))
-
-l_elems = []
-for i in range(ny):
-    for j in range(nx):
-        n0 = Nodes_[i+1][j]
-        n1 = Nodes_[i+1][j+1]
-        n2 = Nodes_[i][j]
-        n3 = Nodes_[i][j+1]
-        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.01) )
-
-# for i in l_elems:
-#     print(i.el_id, i.vec)
+l_nodes = [N0, N1, N2, N3, N4, N5]
 
 # Assembly of Global stiffness B_matrix
-n_e       = l_elems[-1].el_id + 1
-n_n       = l_nodes[-1].nd_id + 1
-dofs      = l_nodes[-1].fi_y+1
+n_e       = len(l_elems)
+n_n       = (len(l_nodes))
+dofs      = n_n*3
 code_nums = list(range(dofs))
-load      = [0 for i in range(dofs)]
-load[0]   = 1
 
-spiel = True
-if spiel:
-    cunt = 0
-    step = 10
-    c_spiel = [i*((n_e*12*12)//10) for i in range(10)]
+load      = [0 for i in range(dofs)]
+load[0]   = 1000
+
+boundary = []
+for i in l_nodes:
+    if i.co_x == 0 and i.co_y == LY:
+        boundary.append(i.w)
+    if i.co_x == LX and i.co_y == 0:
+        boundary.append(i.w)
+    if i.co_x == LX and i.co_y == LY:
+        boundary.append(i.w)
+
+deleto = boundary
+
+
+
+spiel = False
+cunt = 0
+step = 10
+c_spiel = [i*((n_e*12*12)//10) for i in range(10)]
 
 K_gl = np.zeros( (dofs, dofs) )
 for i in l_elems:
@@ -247,25 +239,33 @@ for i in l_elems:
                     print("Assembling global stiffness matrix: {}%".format(step))
                     step += 10
             cunt += 1
+np.savetxt("2elems_full.csv",K_gl, fmt = "%.2e")
 
-### Supports in corners of slab
-boundary = []
-for i in l_nodes:
-    if i.co_x == 0 and i.co_y == LY:
-        boundary.append(i.w)
-    if i.co_x == LX and i.co_y == 0:
-        boundary.append(i.w)
-    if i.co_x == LX and i.co_y == LY:
-        boundary.append(i.w)
-print(boundary)
-deleto = boundary
+del_lol = np.linalg.inv(K_gl)
+r_lol = np.matmul(del_lol, load)
+print(r_lol)
+
 K_gl = np.delete(K_gl, deleto, axis = 0)
 K_gl = np.delete(K_gl, deleto, axis = 1)
 load = np.delete(load, deleto, axis = 0)
+
 code_nums = np.delete(code_nums, deleto, axis = 0)
 
-delta = np.linalg.inv(K_gl)
 
+delta = np.linalg.inv(K_gl)
 r_tot = np.matmul(delta, load)
 
-print(r_tot[0])
+for i in range(len(code_nums)):
+    print(code_nums[i], r_tot[i])
+
+def check_symmetric(a, rtol=1e-05, atol=1e-05):
+    return np.allclose(a, a.T, rtol=rtol, atol=atol)
+
+print(check_symmetric(K_gl))
+
+np.savetxt("2elems_red.csv",K_gl, fmt = "%.2e")
+
+np.savetxt("Mat_el.csv", E0_.k_el, fmt = "%.0f", delimiter = ",")
+
+for i in l_elems:
+    print(i.vec)

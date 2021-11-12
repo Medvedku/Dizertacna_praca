@@ -4,7 +4,7 @@
   <settings ppi="96">
     <identity>
       <id>8f174acb-2330-471d-b0c5-318b29841169</id>
-      <revision>4</revision>
+      <revision>5</revision>
     </identity>
     <calculation>
       <precision>4</precision>
@@ -1424,7 +1424,7 @@
         </input>
       </math>
     </region>
-    <region left="0" top="2151" width="333" height="60" color="#000000" fontSize="16">
+    <region left="0" top="2142" width="333" height="60" color="#000000" fontSize="16">
       <math exponentialThreshold="14">
         <input>
           <e type="operand">E.1</e>
@@ -1440,7 +1440,7 @@
         </result>
       </math>
     </region>
-    <region left="0" top="2223" width="257" height="60" color="#000000" fontSize="16">
+    <region left="0" top="2205" width="257" height="60" color="#000000" fontSize="16">
       <math>
         <input>
           <e type="operand">h.1</e>

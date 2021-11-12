@@ -3,8 +3,8 @@ import numpy as np
 
 a = 0.5
 b = 0.5
-E = 210000000000
-h = 1
+E = 200000000000
+h = 0.01
 mi = 0.3
 
 D = (E*(h**3)) / (12*(1-mi**2))
@@ -80,20 +80,21 @@ for k in K_e:
                 pass
             else:
                 k[i][j] = k[j][i]
-
 # definition: stiffness matrix of element
 K_elem = D * (K_e[0] + K_e[1] + K_e[2] + K_e[3])
 
-deleto = [3,4,5,6,7,8,9,10,11]
-load = [0 for i in range(12)]
-load[2] = 1000
+deleto = [3,6,9]
+print(deleto)
 
+load = [0 for i in range(12)]
+load[0] = 1000
 K_elem = np.delete(K_elem, deleto, axis = 0)
 K_elem = np.delete(K_elem, deleto, axis = 1)
 load = np.delete(load, deleto, axis = 0)
 
 delta = np.linalg.inv(K_elem)
 
-r_tot = np.matmul(K_elem, load)
+r_tot = np.matmul(delta, load)
+
 
 print(r_tot)
