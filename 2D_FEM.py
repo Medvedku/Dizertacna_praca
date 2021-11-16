@@ -1,15 +1,7 @@
 import scipy as sp
 import numpy as np
-from sympy import *
-import sys
-import timeit
-import time
-from scipy.sparse import csr_matrix
-from scipy.sparse import csc_matrix
-from scipy.sparse.linalg import inv
 
-
-np.set_printoptions(precision=1)
+np.set_printoptions(precision=4)
 
 spiel = True
 
@@ -25,8 +17,13 @@ class Node:
         self.fi_y     = Node.num_of_nodes*3 + 2
         self.co_x     = x
         self.co_y     = y
+        self.def_z    = 0
 
         Node.num_of_nodes += 1
+
+    def apply_deformations(self, defm, multiplier):
+        self.def_z    -= defm*multiplier
+
 
 class Element:
     num_of_elements = 0
@@ -107,6 +104,8 @@ class Element:
             self.b_mat = Element.b_mat
             self.d_mat = Element.d_mat
 
+        self.e_loads = []
+
         Element.num_of_elements += 1
 
     def k_elem(self):
@@ -183,38 +182,64 @@ class Element:
         b_matrix[2][11] = -2*(-3/8*b*y**2-b*y/4+b/8)/(a*b)
         return b_matrix
 
+    def get_load_vector(self, q):
+        a = self.a
+        b = self.b
+        q = 4*q*a*b * np.array([1/4, a/12, b/12, 1/4, -a/12, b/12, 1/4, -a/12, -b/12, 1/4, a/12, -b/12])
+        self.e_loads.append(q)
+
+# Definition of construction
+
 LX = 1
 LY = 1
 
-N0 = Node( 0.0,   0.0 )
-N1 = Node( LX/2,  0.0 )
-N2 = Node( LX,    0.0 )
-N3 = Node( 0.0,   LY )
-N4 = Node( LX/2,  LY )
-N5 = Node( LX,    LY )
+nx = 2
+ny = 2
 
-E0_ = Element(N3, N4, N1, N0, h = 0.01, E = 200000000000 )
-E1_ = Element(N4, N5, N2, N1, h = 0.01, E = 200000000000 )
+coor_x = [0+i*(LX/nx) for i in range(nx+1)]
+coor_y = [0+i*(LY/ny) for i in range(ny+1)]
 
-l_elems = [E0_, E1_]
+Nodes_ = np.empty( (ny+1, nx+1), dtype = "int" )
+cunt = 0
+for i in range(ny+1):
+    for j in range(nx+1):
+        Nodes_[i][j] = cunt
+        cunt += 1
 
-l_nodes = [N0, N1, N2, N3, N4, N5]
+l_nodes = []
+for i in range(ny+1):
+    for j in range(nx+1):
+        x_coor = coor_x[j]
+        y_coor = coor_y[i]
+        l_nodes.append(Node(x_coor,y_coor))
 
-print(E0_.k_el)
-print(E1_.k_el)
+l_elems = []
+for i in range(ny):
+    for j in range(nx):
+        n0 = Nodes_[i+1][j]
+        n1 = Nodes_[i+1][j+1]
+        n2 = Nodes_[i][j+1]
+        n3 = Nodes_[i][j]
+        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.01) )
 
-print(E0_.a, E0_.b )
-print(E1_.a, E1_.b )
 
+# for i in l_elems:
+#     i.get_load_vector(2000)
+
+for i in l_elems:
+    i.get_load_vector(1000)
 
 # Assembly of Global stiffness B_matrix
 n_e       = len(l_elems)
-n_n       = (len(l_nodes))
+n_n       = len(l_nodes)
 dofs      = n_n*3
 code_nums = list(range(dofs))
 
-load      = [0 for i in range(dofs)]
-load[0]   = 1000
+load = [0 for i in range(dofs)]
+for e in l_elems:
+    for l in e.e_loads:
+        for i in range(12):             # because element matrix is 12x12 shape
+            load[e.vec[i]] += l[i]
 
 boundary = []
 for i in l_nodes:
@@ -227,23 +252,15 @@ for i in l_nodes:
 
 deleto = boundary
 
+deleto = [6,15,24,21,18,19,10,1,2,5,8]
 
-
-spiel = False
-cunt = 0
-step = 10
-c_spiel = [i*((n_e*12*12)//10) for i in range(10)]
 
 K_gl = np.zeros( (dofs, dofs) )
 for i in l_elems:
     for j in range(12):                 # because element matrix is 12x12 shape
         for k in range(12):             # because element matrix is 12x12 shape
             K_gl[i.vec[j],i.vec[k]] += i.k_el[j,k]
-            if spiel:
-                if cunt in c_spiel:
-                    print("Assembling global stiffness matrix: {}%".format(step))
-                    step += 10
-            cunt += 1
+
 # np.savetxt("2elems_full.csv",K_gl, fmt = "%.2e")
 
 K_gl = np.delete(K_gl, deleto, axis = 0)
@@ -255,7 +272,7 @@ code_nums = np.delete(code_nums, deleto, axis = 0)
 delta = np.linalg.inv(K_gl)
 r_tot = np.matmul(delta, load)
 
-results = [ "{}: {} (in deg:{})".format(code_nums[i],r_tot[i]*1000,np.rad2deg(r_tot[i])) for i in range(len(code_nums)) ]
+results = [ "{}: {} -> (in deg: {})".format(code_nums[i],r_tot[i]*1000,np.rad2deg(r_tot[i])) for i in range(len(code_nums)) ]
 for i in results:
     print(i)
 print(check_symmetric(K_gl))

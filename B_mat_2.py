@@ -2,7 +2,7 @@
 
 import numpy as np
 
-np.set_printoptions(precision=3)
+np.set_printoptions(precision=1)
 
 
 def B_matrix(a, b, x, y):
@@ -45,23 +45,13 @@ def B_matrix(a, b, x, y):
     b_matrix[2][11] = -2*(-3/8*b*y**2-b*y/4+b/8)/(a*b)
     return b_matrix
 
-n_0 = 0
-n_1 = 1
-n_2 = 2
-n_3 = 3
-
-E  = 210 * 1e9
+E  = 200000000000
 mi = 0.3
 h  = 0.01
 p  = 1000
-a  = 0.5
+a  = 0.25
 b  = 0.5
 
-k_local = np.zeros( (12, 12) )
-
-dmat_quad= E * h**3 / (12*(1-mi**2)) * np.array( [[1,  mi, 0         ],
-                                                  [mi, 1,  0         ],
-                                                  [0,  0,  (1-mi)/2  ]])
 
 d_mat = np.zeros( (12,12) )
 D_con = E*h**3/(12*(1-mi**2))
@@ -88,19 +78,23 @@ for i in range(4):
 
 k_elem = (np.transpose(b_mat)@d_mat@b_mat)*a*b
 
+print(k_elem)
 
+indexes = [i for i in range(12)]
 load    = [0 for i in range(12)]
 load[0] = 1000
-deleto  = [3, 6, 7, 8, 9]
+deleto  = [3,6,9]
 
 k_elem = np.delete(k_elem, deleto, axis = 0)
 k_elem = np.delete(k_elem, deleto, axis = 1)
 load = np.delete(load, deleto, axis = 0)
+indexes = np.delete(indexes, deleto, axis = 0)
 
 delta = np.linalg.inv(k_elem)
 r_tot = np.matmul( delta, load )
 
 
-print("K", k_elem)
-print("Load", load)
-print("deffs", r_tot)
+print(r_tot)
+results = [ "{}: {} (in deg:{})".format(indexes[i],r_tot[i]*1000,np.rad2deg(r_tot[i])) for i in range(len(indexes)) ]
+for i in results:
+    print(i)

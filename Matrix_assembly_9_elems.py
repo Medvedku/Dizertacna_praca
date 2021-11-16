@@ -183,33 +183,43 @@ class Element:
         b_matrix[2][11] = -2*(-3/8*b*y**2-b*y/4+b/8)/(a*b)
         return b_matrix
 
+# Definition of construction
+
 LX = 1
 LY = 1
 
-N0 = Node( 0.0,   0.0 )
-N1 = Node( LX/2,  0.0 )
-N2 = Node( LX,    0.0 )
-N3 = Node( 0.0,   LY )
-N4 = Node( LX/2,  LY )
-N5 = Node( LX,    LY )
+nx = 2
+ny = 2
 
-E0_ = Element(N3, N4, N1, N0, h = 0.01, E = 200000000000 )
-E1_ = Element(N4, N5, N2, N1, h = 0.01, E = 200000000000 )
+coor_x = [0+i*(LX/nx) for i in range(nx+1)]
+coor_y = [0+i*(LY/ny) for i in range(ny+1)]
 
-l_elems = [E0_, E1_]
+Nodes_ = np.empty( (ny+1, nx+1), dtype = "int" )
+cunt = 0
+for i in range(ny+1):
+    for j in range(nx+1):
+        Nodes_[i][j] = cunt
+        cunt += 1
 
-l_nodes = [N0, N1, N2, N3, N4, N5]
+l_nodes = []
+for i in range(ny+1):
+    for j in range(nx+1):
+        x_coor = coor_x[j]
+        y_coor = coor_y[i]
+        l_nodes.append(Node(x_coor,y_coor))
 
-print(E0_.k_el)
-print(E1_.k_el)
-
-print(E0_.a, E0_.b )
-print(E1_.a, E1_.b )
-
+l_elems = []
+for i in range(ny):
+    for j in range(nx):
+        n0 = Nodes_[i+1][j]
+        n1 = Nodes_[i+1][j+1]
+        n2 = Nodes_[i][j+1]
+        n3 = Nodes_[i][j]
+        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.01) )
 
 # Assembly of Global stiffness B_matrix
 n_e       = len(l_elems)
-n_n       = (len(l_nodes))
+n_n       = len(l_nodes)
 dofs      = n_n*3
 code_nums = list(range(dofs))
 
