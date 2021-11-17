@@ -111,11 +111,6 @@ defs = np.ndarray(shape=(vz, vy, vx, 3))
 Elements = []
 nodes_   = []
 
-
-print("Nodes", Nodes)
-print("defs", defs)
-quit()
-
 cunt = 0
 for z in range(vz):
     for y in range(vy):

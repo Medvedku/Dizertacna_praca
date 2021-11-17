@@ -1,9 +1,9 @@
 import scipy as sp
 import numpy as np
 
-np.set_printoptions(precision=4)
+np.set_printoptions(precision=2)
 
-spiel = True
+spiel = 1
 
 def check_symmetric(a, rtol=1e-05, atol=1e-05):
     return np.allclose(a, a.T, rtol=rtol, atol=atol)
@@ -21,8 +21,8 @@ class Node:
 
         Node.num_of_nodes += 1
 
-    def apply_deformations(self, defm, multiplier):
-        self.def_z    -= defm*multiplier
+    def apply_deformation(self, defm):
+        self.def_z    -= defm
 
 
 class Element:
@@ -129,14 +129,17 @@ class Element:
         gauss_y=[-1/3**0.5, -1/3**0.5, +1/3**0.5, +1/3**0.5]
 
         b_mat = None
+        b_matrix = []
         for i in range(4):
             x_g = gauss_x[i]
             y_g = gauss_y[i]
             b_mat_b = self.B_matrix(a, b, x_g, y_g)
             if i == 0:
                 b_mat = b_mat_b
+                b_matrix.append(b_mat_b)
             else:
                 b_mat = np.concatenate( ( b_mat, b_mat_b) )
+                b_matrix.append(b_mat_b)
 
         K_elem = (np.transpose(b_mat)@d_mat@b_mat)*a*b
 
@@ -188,13 +191,19 @@ class Element:
         q = 4*q*a*b * np.array([1/4, a/12, b/12, 1/4, -a/12, b/12, 1/4, -a/12, -b/12, 1/4, a/12, -b/12])
         self.e_loads.append(q)
 
+    def get_def_vector(self, c_n, r_t):
+        pass
+
 # Definition of construction
 
-LX = 1
-LY = 1
+LX = 5
+LY = 8
 
-nx = 2
-ny = 2
+mesh = 1
+
+nx = int(LX/mesh)
+ny = int(LY/mesh)
+
 
 coor_x = [0+i*(LX/nx) for i in range(nx+1)]
 coor_y = [0+i*(LY/ny) for i in range(ny+1)]
@@ -222,6 +231,7 @@ for i in range(ny):
         n3 = Nodes_[i][j]
         l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.01) )
 
+## LOAD CASES
 
 # for i in l_elems:
 #     i.get_load_vector(2000)
@@ -241,6 +251,33 @@ for e in l_elems:
         for i in range(12):             # because element matrix is 12x12 shape
             load[e.vec[i]] += l[i]
 
+# # 4 points around
+# boundary = []
+# for i in l_nodes:
+#     if i.co_x == 0 and i.co_y == LY:
+#         boundary.append(i.w)
+#     if i.co_x == LX and i.co_y == 0:
+#         boundary.append(i.w)
+#     if i.co_x == LX and i.co_y == LY:
+#         boundary.append(i.w)
+#     if i.co_x == 0 and i.co_y == 0:
+#         boundary.append(i.w)
+# deleto = boundary
+
+# # 4 Edges around
+# boundary = []
+# for i in l_nodes:
+#     if i.co_x == 0:
+#         boundary.append(i.w)
+#     if i.co_x == LX:
+#         boundary.append(i.w)
+#     if i.co_y == 0:
+#         boundary.append(i.w)
+#     if i.co_y == LY:
+#         boundary.append(i.w)
+# deleto = boundary
+
+# 4 points around
 boundary = []
 for i in l_nodes:
     if i.co_x == 0 and i.co_y == LY:
@@ -249,10 +286,11 @@ for i in l_nodes:
         boundary.append(i.w)
     if i.co_x == LX and i.co_y == LY:
         boundary.append(i.w)
-
+    if i.co_x == 0 and i.co_y == 0:
+        boundary.append(i.w)
+    if i.co_y == LY/2:
+        boundary.append(i.w)
 deleto = boundary
-
-deleto = [6,15,24,21,18,19,10,1,2,5,8]
 
 
 K_gl = np.zeros( (dofs, dofs) )
@@ -272,7 +310,119 @@ code_nums = np.delete(code_nums, deleto, axis = 0)
 delta = np.linalg.inv(K_gl)
 r_tot = np.matmul(delta, load)
 
-results = [ "{}: {} -> (in deg: {})".format(code_nums[i],r_tot[i]*1000,np.rad2deg(r_tot[i])) for i in range(len(code_nums)) ]
-for i in results:
-    print(i)
-print(check_symmetric(K_gl))
+results = [ "{}: {} -> (in deg: {})".format(code_nums[i], r_tot[i]*1000, np.rad2deg(r_tot[i])) for i in range(len(code_nums)) ]
+
+for i in range(len(r_tot)):
+    if code_nums[i]%3 == 0:
+        l_nodes[code_nums[i]//3].apply_deformation(r_tot[i])
+
+vector = list(l_elems[0].vec)
+b = []
+for i in range(12):
+    if (vector[i] in code_nums):
+        index = list(code_nums).index(vector[i])
+        b.append(r_tot[i])
+    else:
+        b.append(0)
+
+a = []
+for i in range(4):
+    a.append( [b[i*3], b[i*3+1], b[i*3+2]] )
+
+a = np.array(a)
+
+b_matica = l_elems[0].b_mat
+
+E  = 200000000000
+mi = 0.3
+h  = 0.01
+p  = 1000
+
+d_matica = E / (1 - mi**2) * np.array( [ [1,  mi, 0        ],
+                                         [mi, 1,  0        ],
+                                         [0,  0,  (1-mi)/2 ] ] )
+
+print(b_matica)
+quit()
+print(d_matica @ b_matica[0] @ a[0])
+Ms = None
+print(np.shape(d_matica))
+print(np.shape(b_matica[0]))
+print(np.shape(a[0]))
+for i in range(3):
+    Ms += d_matica @ b_matica[i] @ a[i]
+print(Ms)
+# for i in b_matica:
+#     print(i)
+
+
+# print(a)
+# print(d_matica)
+# print(b_matica)
+#
+#
+# momenty = d_matica @ b_matica @ a
+# print(momenty)
+
+
+
+spiel = 0
+if spiel:
+    scale = 2
+    # PLOT
+    import matplotlib.pyplot as plt
+    import mpl_toolkits.mplot3d as plt3d
+    from matplotlib import cm
+    from matplotlib.ticker import LinearLocator
+
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+
+    red_r_tot  = []
+    red_c_nums = []
+    for i in range(len(code_nums)):
+        if code_nums[i]%3 == 0:
+            red_r_tot.append(r_tot[i])
+            red_c_nums.append(code_nums[i])
+
+    r_max = max(red_r_tot)
+    r_min = min(red_r_tot)
+    c_n_max = red_c_nums[red_r_tot.index(r_max)]
+    c_n_min = red_c_nums[red_r_tot.index(r_min)]
+
+    if LX > LY:
+        ax.set_xlim( (0, LX) )
+        ax.set_ylim( (-abs(LX-LY)/2, LY+(abs(LX-LY)/2)) )
+        ax.set_zlim( (min(-scale*r_max,0), max(-scale*r_min,0)) )
+    elif LX < LY:
+        ax.set_xlim( (-abs(LX-LY)/2, LX+(abs(LX-LY)/2)) )
+        ax.set_ylim( (0,LY) )
+        ax.set_zlim( (min(-scale*r_max,0), max(-scale*r_min,0)) )
+    else:
+        ax.set_xlim( (0,LX) )
+        ax.set_ylim( (0,LY) )
+        ax.set_zlim( (min(-scale*r_max,0), max(-scale*r_min,0)) )
+
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
+
+    X = np.zeros( (ny+1, nx+1) )
+    Y = np.zeros( (ny+1, nx+1) )
+    Z = np.zeros( (ny+1, nx+1) )
+    Z_= np.zeros( (ny+1, nx+1) )
+
+    for i in range(ny+1):
+        for j in range(nx+1):
+            n = Nodes_[i,j]
+            X[i,j] = l_nodes[n].co_x
+            Y[i,j] = l_nodes[n].co_y
+            Z[i,j] = 0
+            Z_[i,j]= l_nodes[n].def_z
+
+    surf_undef = ax.plot_surface(X, Y, Z,
+                           linewidth=1, antialiased=True, alpha = 0.1 )
+
+    surf_def   = ax.plot_surface(X, Y, Z_, cmap=cm.coolwarm,
+                           linewidth=0, antialiased=True, alpha = 0.5 )
+
+    plt.show()
