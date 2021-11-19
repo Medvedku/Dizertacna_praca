@@ -1,7 +1,7 @@
 import scipy as sp
 import numpy as np
 
-np.set_printoptions(precision=2)
+np.set_printoptions(precision=1)
 
 spiel = 1
 
@@ -35,6 +35,13 @@ class Element:
     k  = None
     d_mat  = None
     b_mat  = None
+
+    aa = 1 + 3**(1/2)
+    bb = 1 - 3**(1/2)
+    mstress = 1/4 * np.array([  [aa*aa, aa*bb, bb*bb, aa*bb],
+                                [aa*bb, aa*aa, aa*bb, bb*bb],
+                                [bb*bb, aa*bb, aa*aa, aa*bb],
+                                [aa*bb, bb*bb, aa*bb, aa*aa] ])
 
     def __init__(self, n0, n1, n2, n3, E = 210*1e9, mi = 0.3, h = 0.01):
         self.Flag   = False
@@ -143,44 +150,44 @@ class Element:
 
         K_elem = (np.transpose(b_mat)@d_mat@b_mat)*a*b
 
-        return K_elem, b_mat, d_mat
+        return K_elem, b_matrix, d_mat
 
     def B_matrix(self, a, b, x, y):
         b_matrix = np.zeros( (3, 12) )
-        b_matrix[0][0] = -3*(x-x*y)/(4*a**2)
-        b_matrix[0][1] = -((3*a*x-3*a*x*y-a+a*y)/4)/a**2
-        b_matrix[0][2] = 0
-        b_matrix[0][3] = -3*(-x+x*y)/(4*a**2)
-        b_matrix[0][4] = -((3*a*x-3*a*x*y+a-a*y)/4)/a**2
-        b_matrix[0][5] = 0
-        b_matrix[0][6] = -3*(-x-x*y)/(4*a**2)
-        b_matrix[0][7] = -((3*a*x+3*a*x*y+a+a*y)/4)/a**2
-        b_matrix[0][8] = 0
-        b_matrix[0][9] = -3*(x+x*y)/(4*a**2)
+        b_matrix[0][0]  = -3*(x-x*y)/(4*a**2)
+        b_matrix[0][1]  = -((3*a*x-3*a*x*y-a+a*y)/4)/a**2
+        b_matrix[0][2]  = 0
+        b_matrix[0][3]  = -3*(-x+x*y)/(4*a**2)
+        b_matrix[0][4]  = -((3*a*x-3*a*x*y+a-a*y)/4)/a**2
+        b_matrix[0][5]  = 0
+        b_matrix[0][6]  = -3*(-x-x*y)/(4*a**2)
+        b_matrix[0][7]  = -((3*a*x+3*a*x*y+a+a*y)/4)/a**2
+        b_matrix[0][8]  = 0
+        b_matrix[0][9]  = -3*(x+x*y)/(4*a**2)
         b_matrix[0][10] = -((3*a*x+3*a*x*y-a-a*y)/4)/a**2
         b_matrix[0][11] = 0
-        b_matrix[1][0] = -3*(y-x*y)/(4*b**2)
-        b_matrix[1][1] = 0
-        b_matrix[1][2] = -((3*b*y-3*b*x*y-b+b*x)/4)/b**2
-        b_matrix[1][3] = -3*(y+x*y)/(4*b**2)
-        b_matrix[1][4] = 0
-        b_matrix[1][5] = -((3*b*y+3*b*x*y-b-b*x)/4)/b**2
-        b_matrix[1][6] = -3*(-y-x*y)/(4*b**2)
-        b_matrix[1][7] = 0
-        b_matrix[1][8] = -((3*b*y+3*b*x*y+b+b*x)/4)/b**2
-        b_matrix[1][9] = -3*(-y+x*y)/(4*b**2)
+        b_matrix[1][0]  = -3*(y-x*y)/(4*b**2)
+        b_matrix[1][1]  = 0
+        b_matrix[1][2]  = -((3*b*y-3*b*x*y-b+b*x)/4)/b**2
+        b_matrix[1][3]  = -3*(y+x*y)/(4*b**2)
+        b_matrix[1][4]  = 0
+        b_matrix[1][5]  = -((3*b*y+3*b*x*y-b-b*x)/4)/b**2
+        b_matrix[1][6]  = -3*(-y-x*y)/(4*b**2)
+        b_matrix[1][7]  = 0
+        b_matrix[1][8]  = -((3*b*y+3*b*x*y+b+b*x)/4)/b**2
+        b_matrix[1][9]  = -3*(-y+x*y)/(4*b**2)
         b_matrix[1][10] = 0
         b_matrix[1][11] = -((3*b*y-3*b*x*y+b-b*x)/4)/b**2
-        b_matrix[2][0] = -2*(1/2-3*x**2/8-3*y**2/8)/(a*b)
-        b_matrix[2][1] = -2*(-3/8*a*x**2+a*x/4+a/8)/(a*b)
-        b_matrix[2][2] = -2*(-3/8*b*y**2+b*y/4+b/8)/(a*b)
-        b_matrix[2][3] = -2*(-1/2+3*x**2/8+3*y**2/8)/(a*b)
-        b_matrix[2][4] = -2*(-3/8*a*x**2-a*x/4+a/8)/(a*b)
-        b_matrix[2][5] = -2*(3/8*b*y**2-b*y/4-b/8)/(a*b)
-        b_matrix[2][6] = -2*(1/2-3*x**2/8-3*y**2/8)/(a*b)
-        b_matrix[2][7] = -2*(3/8*a*x**2+a*x/4-a/8)/(a*b)
-        b_matrix[2][8] = -2*(3/8*b*y**2+b*y/4-b/8)/(a*b)
-        b_matrix[2][9] = -2*(-1/2+3*x**2/8+3*y**2/8)/(a*b)
+        b_matrix[2][0]  = -2*(1/2-3*x**2/8-3*y**2/8)/(a*b)
+        b_matrix[2][1]  = -2*(-3/8*a*x**2+a*x/4+a/8)/(a*b)
+        b_matrix[2][2]  = -2*(-3/8*b*y**2+b*y/4+b/8)/(a*b)
+        b_matrix[2][3]  = -2*(-1/2+3*x**2/8+3*y**2/8)/(a*b)
+        b_matrix[2][4]  = -2*(-3/8*a*x**2-a*x/4+a/8)/(a*b)
+        b_matrix[2][5]  = -2*(3/8*b*y**2-b*y/4-b/8)/(a*b)
+        b_matrix[2][6]  = -2*(1/2-3*x**2/8-3*y**2/8)/(a*b)
+        b_matrix[2][7]  = -2*(3/8*a*x**2+a*x/4-a/8)/(a*b)
+        b_matrix[2][8]  = -2*(3/8*b*y**2+b*y/4-b/8)/(a*b)
+        b_matrix[2][9]  = -2*(-1/2+3*x**2/8+3*y**2/8)/(a*b)
         b_matrix[2][10] = -2*(3/8*a*x**2-a*x/4-a/8)/(a*b)
         b_matrix[2][11] = -2*(-3/8*b*y**2-b*y/4+b/8)/(a*b)
         return b_matrix
@@ -199,7 +206,7 @@ class Element:
 LX = 5
 LY = 8
 
-mesh = 1
+mesh = .5
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)
@@ -280,7 +287,9 @@ for e in l_elems:
 # 4 points around
 boundary = []
 for i in l_nodes:
-    if i.co_x == 0 and i.co_y == LY:
+    # if i.co_x == 0 and i.co_y == LY:
+    #     boundary.append(i.w)
+    if i.co_x == 0 and i.co_y >= 0.5*LY:
         boundary.append(i.w)
     if i.co_x == LX and i.co_y == 0:
         boundary.append(i.w)
@@ -288,7 +297,29 @@ for i in l_nodes:
         boundary.append(i.w)
     if i.co_x == 0 and i.co_y == 0:
         boundary.append(i.w)
-    if i.co_y == LY/2:
+    if i.co_y == LY/2 and i.co_x <= LX/2:
+        boundary.append(i.w)
+
+    if i.co_x == 0.5 and i.co_y == 0.5:
+        boundary.append(i.w)
+    if i.co_x == 0 and i.co_y <= 1:
+        boundary.append(i.w)
+    if i.co_x == 0.5 and i.co_y <= 1:
+        boundary.append(i.w)
+    if i.co_x == 1 and i.co_y <= 1:
+        boundary.append(i.w)
+deleto = boundary
+
+# 4 Edges around
+boundary = []
+for i in l_nodes:
+    if i.co_x == 0:
+        boundary.append(i.w)
+    if i.co_x == LX:
+        boundary.append(i.w)
+    if i.co_y == 0:
+        boundary.append(i.w)
+    if i.co_y == LY:
         boundary.append(i.w)
 deleto = boundary
 
@@ -324,6 +355,7 @@ for i in range(12):
         b.append(r_tot[i])
     else:
         b.append(0)
+b = np.array(b)
 
 a = []
 for i in range(4):
@@ -338,35 +370,20 @@ mi = 0.3
 h  = 0.01
 p  = 1000
 
-d_matica = E / (1 - mi**2) * np.array( [ [1,  mi, 0        ],
-                                         [mi, 1,  0        ],
-                                         [0,  0,  (1-mi)/2 ] ] )
+d_matica = E*h**3/(12*(1-mi**2)) * np.array( [ [1,  mi, 0        ],
+                                               [mi, 1,  0        ],
+                                               [0,  0,  (1-mi)/2 ] ] )
 
-print(b_matica)
-quit()
-print(d_matica @ b_matica[0] @ a[0])
-Ms = None
-print(np.shape(d_matica))
-print(np.shape(b_matica[0]))
-print(np.shape(a[0]))
-for i in range(3):
-    Ms += d_matica @ b_matica[i] @ a[i]
-print(Ms)
-# for i in b_matica:
-#     print(i)
+stress = np.zeros( (1,3) )
 
-
-# print(a)
-# print(d_matica)
-# print(b_matica)
-#
-#
-# momenty = d_matica @ b_matica @ a
-# print(momenty)
+for i in range(4):
+    stress += d_matica @ b_matica[i] @ b
+    print(d_matica @ b_matica[i] @ b)
+print(stress)
 
 
 
-spiel = 0
+spiel = 1
 if spiel:
     scale = 2
     # PLOT
@@ -420,9 +437,15 @@ if spiel:
             Z_[i,j]= l_nodes[n].def_z
 
     surf_undef = ax.plot_surface(X, Y, Z,
-                           linewidth=1, antialiased=True, alpha = 0.1 )
+                 linewidth=1, antialiased=True, alpha = 0.1 )
 
     surf_def   = ax.plot_surface(X, Y, Z_, cmap=cm.coolwarm,
-                           linewidth=0, antialiased=True, alpha = 0.5 )
+                 linewidth=0, antialiased=True, alpha = 0.5 )
+
+    for i in deleto:
+        ax.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], [0.], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+
+    ax.plot([l_nodes[c_n_max//3].co_x], [l_nodes[c_n_max//3].co_y], [l_nodes[c_n_max//3].def_z], markeredgecolor='b', marker='x', markersize=7, alpha=0.7)
+    ax.plot([l_nodes[c_n_min//3].co_x], [l_nodes[c_n_min//3].co_y], [l_nodes[c_n_min//3].def_z], markeredgecolor='r', marker='x', markersize=7, alpha=0.7)
 
     plt.show()
