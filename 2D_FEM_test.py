@@ -1,6 +1,6 @@
 import numpy as np
 
-np.set_printoptions(precision=1)
+np.set_printoptions(precision=2)
 
 spiel = 1
 
@@ -333,7 +333,7 @@ for i in l_nodes:
     #     boundary.append(i.fi_y)
 deleto = boundary
 
-# 4 Edges around
+# # 4 Edges around
 # boundary = []
 # for i in l_nodes:
 #     if i.co_x == 0:
@@ -465,6 +465,24 @@ if _2D:
 
     for i in deleto:
         plt.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+
+
+    x = np.arange(0+0.5*mesh, LX, mesh)
+    print(x)
+    y = np.arange(0+0.5*mesh, LY, mesh)
+    print(y)
+    X, Y = np.meshgrid(x, y)
+    Z = np.zeros(np.shape(X))
+    cunt = 0
+    for i in range(len(Z)):
+        for j in range(len(Z[0])):
+            Z[i,j] = l_elems[cunt].moments[2]
+            cunt +=1
+    print(Z)
+    print(np.shape(X), np.shape(Y))
+
+    plt.contour(X, Y, Z)
+    # ax.clabel(CS, inline=True, fontsize=5)
 
     plt.title('A Basic Line Plot')
     plt.xlabel('X-axis')
