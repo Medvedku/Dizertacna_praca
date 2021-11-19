@@ -1,4 +1,3 @@
-import scipy as sp
 import numpy as np
 
 np.set_printoptions(precision=1)
@@ -43,7 +42,7 @@ class Element:
                                 [bb*bb, aa*bb, aa*aa, aa*bb],
                                 [aa*bb, bb*bb, aa*bb, aa*aa] ])
 
-    def __init__(self, n0, n1, n2, n3, E = 210*1e9, mi = 0.3, h = 0.01):
+    def __init__(self, n0, n1, n2, n3, E = 200*1e9, mi = 0.3, h = 0.01):
         self.Flag   = False
 
         self.el_id  = Element.num_of_elements
@@ -198,15 +197,33 @@ class Element:
         q = 4*q*a*b * np.array([1/4, a/12, b/12, 1/4, -a/12, b/12, 1/4, -a/12, -b/12, 1/4, a/12, -b/12])
         self.e_loads.append(q)
 
-    def get_def_vector(self, c_n, r_t):
-        pass
+    def get_internal_forces(self, c_n, r_t):
+        a = []
+        for i in range(12):
+            if (self.vec[i] in c_n):
+                indx = list(c_n).index(self.vec[i])
+                a.append(r_t[indx])
+            else:
+                a.append(0)
+        a = np.array(a)
+
+        d_mtrx =    self.E*self.h**3/(12*(1-self.mi**2)) * np.array([
+                    [1,       self.mi, 0             ],
+                    [self.mi, 1,       0             ],
+                    [0,       0,       (1-self.mi)/2 ] ] )
+
+        stress = [ 0, 0, 0 ]
+        for i in range(4):
+            stress += d_mtrx @ self.b_mat[i] @ a
+
+        self.moments = stress
 
 # Definition of construction
 
 LX = 5
 LY = 8
 
-mesh = .5
+mesh = .2
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)
@@ -302,18 +319,18 @@ for i in l_nodes:
 
     # if i.co_x == 0.5 and i.co_y == 0.5:
     #     boundary.append(i.w)
-    if i.co_x == 0 and i.co_y <= 1:
-        boundary.append(i.w)
-        boundary.append(i.fi_x)
-        boundary.append(i.fi_y)
-    if i.co_x == 0.5 and i.co_y <= 1:
-        boundary.append(i.w)
-        boundary.append(i.fi_x)
-        boundary.append(i.fi_y)
-    if i.co_x == 1 and i.co_y <= 1:
-        boundary.append(i.w)
-        boundary.append(i.fi_x)
-        boundary.append(i.fi_y)
+    # if i.co_x == 0 and i.co_y <= 1:
+    #     boundary.append(i.w)
+    #     boundary.append(i.fi_x)
+    #     boundary.append(i.fi_y)
+    # if i.co_x == 0.5 and i.co_y <= 1:
+    #     boundary.append(i.w)
+    #     boundary.append(i.fi_x)
+    #     boundary.append(i.fi_y)
+    # if i.co_x == 1 and i.co_y <= 1:
+    #     boundary.append(i.w)
+    #     boundary.append(i.fi_x)
+    #     boundary.append(i.fi_y)
 deleto = boundary
 
 # 4 Edges around
@@ -353,40 +370,8 @@ for i in range(len(r_tot)):
     if code_nums[i]%3 == 0:
         l_nodes[code_nums[i]//3].apply_deformation(r_tot[i])
 
-vector = list(l_elems[0].vec)
-b = []
-for i in range(12):
-    if (vector[i] in code_nums):
-        index = list(code_nums).index(vector[i])
-        b.append(r_tot[index])
-    else:
-        b.append(0)
-b = np.array(b)
-
-a = []
-for i in range(4):
-    a.append( [b[i*3], b[i*3+1], b[i*3+2]] )
-
-a = np.array(a)
-
-b_matica = l_elems[0].b_mat
-
-E  = 200000000000
-mi = 0.3
-h  = 0.01
-p  = 1000
-
-d_matica = E*h**3/(12*(1-mi**2)) * np.array( [ [1,  mi, 0        ],
-                                               [mi, 1,  0        ],
-                                               [0,  0,  (1-mi)/2 ] ] )
-
-stress = np.zeros( (1,3) )
-
-for i in range(4):
-    stress += d_matica @ b_matica[i] @ b
-    print(d_matica @ b_matica[i] @ b)
-print(stress)
-
+for i in l_elems:
+    i.get_internal_forces(code_nums, r_tot)
 
 
 spiel = 1
