@@ -300,28 +300,34 @@ for i in l_nodes:
     if i.co_y == LY/2 and i.co_x <= LX/2:
         boundary.append(i.w)
 
-    if i.co_x == 0.5 and i.co_y == 0.5:
-        boundary.append(i.w)
+    # if i.co_x == 0.5 and i.co_y == 0.5:
+    #     boundary.append(i.w)
     if i.co_x == 0 and i.co_y <= 1:
         boundary.append(i.w)
+        boundary.append(i.fi_x)
+        boundary.append(i.fi_y)
     if i.co_x == 0.5 and i.co_y <= 1:
         boundary.append(i.w)
+        boundary.append(i.fi_x)
+        boundary.append(i.fi_y)
     if i.co_x == 1 and i.co_y <= 1:
         boundary.append(i.w)
+        boundary.append(i.fi_x)
+        boundary.append(i.fi_y)
 deleto = boundary
 
 # 4 Edges around
-boundary = []
-for i in l_nodes:
-    if i.co_x == 0:
-        boundary.append(i.w)
-    if i.co_x == LX:
-        boundary.append(i.w)
-    if i.co_y == 0:
-        boundary.append(i.w)
-    if i.co_y == LY:
-        boundary.append(i.w)
-deleto = boundary
+# boundary = []
+# for i in l_nodes:
+#     if i.co_x == 0:
+#         boundary.append(i.w)
+#     if i.co_x == LX:
+#         boundary.append(i.w)
+#     if i.co_y == 0:
+#         boundary.append(i.w)
+#     if i.co_y == LY:
+#         boundary.append(i.w)
+# deleto = boundary
 
 
 K_gl = np.zeros( (dofs, dofs) )
@@ -352,7 +358,7 @@ b = []
 for i in range(12):
     if (vector[i] in code_nums):
         index = list(code_nums).index(vector[i])
-        b.append(r_tot[i])
+        b.append(r_tot[index])
     else:
         b.append(0)
 b = np.array(b)
