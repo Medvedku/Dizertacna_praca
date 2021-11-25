@@ -1,6 +1,6 @@
 import numpy as np
 
-np.set_printoptions(precision=2)
+np.set_printoptions(precision=1)
 
 spiel = 1
 
@@ -37,7 +37,7 @@ class Element:
 
     aa = 1 + 3**(1/2)
     bb = 1 - 3**(1/2)
-    mstress = 1/4 * np.array([  [aa*aa, aa*bb, bb*bb, aa*bb],
+    mstress = (1/4) * np.array([[aa*aa, aa*bb, bb*bb, aa*bb],
                                 [aa*bb, aa*aa, aa*bb, bb*bb],
                                 [bb*bb, aa*bb, aa*aa, aa*bb],
                                 [aa*bb, bb*bb, aa*bb, aa*aa] ])
@@ -216,14 +216,14 @@ class Element:
         for i in range(4):
             stress += d_mtrx @ self.b_mat[i] @ a
 
-        self.moments = stress
+        self.moments = stress/4
 
 # Definition of construction
 
-LX = 5
-LY = 8
+LX = 6
+LY = 9
 
-mesh = .5
+mesh = .75
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)
@@ -253,7 +253,7 @@ for i in range(ny):
         n1 = Nodes_[i+1][j+1]
         n2 = Nodes_[i][j+1]
         n3 = Nodes_[i][j]
-        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.01) )
+        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.200, E = 32.8*1e9) )
 
 ## LOAD CASES
 
@@ -373,8 +373,35 @@ for i in range(len(r_tot)):
 for i in l_elems:
     i.get_internal_forces(code_nums, r_tot)
 
+print(l_elems[0].moments)
 
-_3D = 1
+x = np.arange(0+0.5*mesh, LX, mesh)
+y = np.arange(0+0.5*mesh, LY, mesh)
+X, Y = np.meshgrid(x, y)
+Z = np.zeros(np.shape(X))
+
+cunt = 0
+for i in range(len(Z)):
+    for j in range(len(Z[0])):
+        Z[i,j] = int(l_elems[cunt].moments[0])
+        cunt +=1
+print(Z)
+
+red_r_tot  = []
+red_c_nums = []
+for i in range(len(code_nums)):
+    if code_nums[i]%3 == 0:
+        red_r_tot.append(r_tot[i])
+        red_c_nums.append(code_nums[i])
+
+r_max = max(red_r_tot)
+r_min = min(red_r_tot)
+c_n_max = red_c_nums[red_r_tot.index(r_max)]
+c_n_min = red_c_nums[red_r_tot.index(r_min)]
+
+print(r_max, r_min)
+
+_3D = 0
 if _3D:
     scale = 2
     # PLOT
@@ -466,20 +493,16 @@ if _2D:
     for i in deleto:
         plt.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
 
-
     x = np.arange(0+0.5*mesh, LX, mesh)
-    print(x)
     y = np.arange(0+0.5*mesh, LY, mesh)
-    print(y)
     X, Y = np.meshgrid(x, y)
     Z = np.zeros(np.shape(X))
+
     cunt = 0
     for i in range(len(Z)):
         for j in range(len(Z[0])):
             Z[i,j] = l_elems[cunt].moments[2]
             cunt +=1
-    print(Z)
-    print(np.shape(X), np.shape(Y))
 
     plt.contour(X, Y, Z)
     # ax.clabel(CS, inline=True, fontsize=5)
