@@ -18,6 +18,7 @@ filt_c = (d_con["Class"]==concrete)
 f_ck   = d_con.loc[filt_c, "f_ck"].values[0]
 f_cd   = f_ck / gamma_c
 f_ctm  = d_con.loc[filt_c, "f_ctm"].values[0]
+E_cm   = d_con.loc[filt_c, "E_cm"].values[0]
 
 #  Steel
 steel  = "B500B"
@@ -279,17 +280,20 @@ class Element:
 
         x_lim = (700*d_)/(700+f_yd)
         if self.M_Ed > 0:
-            x = d_ - (d_**2 - ( self.M_Ed / (0.5*b_*f_cd*1e6) ))**(1/2)    #<<<<<<<<<<<<<<< Treba opraviť neviem čo to robí ale hádže menej výstuže ako treba :-/
-            x_b = 0.8*x
+            x_b = d_ - (d_**2 - ( self.M_Ed / (0.5*b_*f_cd*1e6) ))**(1/2)
+            x = x_b/0.8
             self.iks = x
-            if x_b >= x_lim:
-                print("x_b is greater then x_lim -> Aborting computation")
+            if x >= x_lim:
+                print("x is greater then x_lim -> Aborting computation")
                 quit()
             self.As_req_b_0 = (x_b * b_ * f_cd) / f_yd
         else:
             self.As_req_b_0 = 0
             self.iks = 0
         self.As_b_0 = max( self.As_min_b_0 , self.As_req_b_0 )
+
+        self.de = d_
+        self.be = b_
 
 # Definition of construction
 
@@ -326,7 +330,7 @@ for i in range(ny):
         n1 = Nodes_[i+1][j+1]
         n2 = Nodes_[i][j+1]
         n3 = Nodes_[i][j]
-        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.200, E = 32.8*1e9) )
+        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.200, E = E_cm*1e9) )
 
 ## LOAD CASES
 
@@ -334,7 +338,7 @@ for i in range(ny):
 #     i.get_load_vector(2000)
 
 for i in l_elems:
-    i.get_load_vector(15000)
+    i.get_load_vector(20*1e3)
 
 # Assembly of Global stiffness B_matrix
 n_e       = len(l_elems)
@@ -470,11 +474,24 @@ for i in range(len(Z)):
         de[i,j] = l_elems[cunt].As_req_b_0 * 1e4
         iks[i,j] = l_elems[cunt].iks
         cunt +=1
-print(Z)
+# print(Z)
 
-# print(de)
-print(iks)
+# # print(de)
+# print(iks)
 print(A)
+#
+# M_Ed = l_elems[3].M_Ed
+# b_ = l_elems[3].be
+# d_ = l_elems[3].de
+#
+# print(M_Ed, d_, b_, f_cd*1e6)
+#
+# x = d_ - (d_**2 - ( M_Ed / (0.5*b_*f_cd*1e6) ))**(1/2)
+# As_req_b_0 = (0.8*x * b_ * f_cd) / f_yd
+#
+# print(x, As_req_b_0*1e4)
+
+
 
 red_r_tot  = []
 red_c_nums = []

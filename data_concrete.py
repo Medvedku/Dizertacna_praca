@@ -59,7 +59,7 @@ df["f_cm"] = df["f_ck"] + 8
 df = df.assign(f_ctm = df.apply(get_f_ctm, axis=1))
 df["f_ck_0.05"] = 0.7 * df["f_ctm"]
 df["f_ck_0.905"] = 1.3 * df["f_ctm"]
-df["E_cm"] = 22 * (df["f_ctm"]/10)**(0.3)
+df["E_cm"] = 22 * (df["f_cm"]/10)**(0.3)
 df = df.assign(eps_c1 = df.apply(get_eps_c1, axis=1))
 df = df.assign(eps_cu1 = df.apply(get_eps_cu1, axis=1))
 df = df.assign(eps_c2 = df.apply(get_eps_c2, axis=1))
@@ -68,10 +68,10 @@ df = df.assign(n = df.apply(n, axis=1))
 df = df.assign(eps_c3 = df.apply(get_eps_c3, axis=1))
 df = df.assign(eps_cu3 = df.apply(get_eps_cu3, axis=1))
 
-
 concrete = "C30/37"
 
 filt = (df["Class"]==concrete)
 
-jozo = df.loc[filt, "f_ck"].values[0]
+jozo = df.loc[filt, "E_cm"].values[0]
+
 df.to_csv("Concrete_data.csv", index=False)
