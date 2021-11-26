@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-np.set_printoptions(precision=1)
+np.set_printoptions(precision=2)
 
 spiel = 0
 
@@ -240,7 +240,7 @@ class Element:
 
         self.moments = stress/4
 
-    def get_bottom_rebar_0(self, layer_b0="X", d_b0=10, d_b1=12, c_n=None):
+    def get_bot_rebar(self, layer_b0="X", d_b0=10, d_b1=12, c_n=None):
         """Takes argument layer_b0 as a first layer of rebar at the bottom of slab.
 
             Arg:
@@ -255,16 +255,18 @@ class Element:
                 c_n:      Concrete reinforcement cover layer
                             Direct input in milimeters or cumputed based on EN if left void.
         """
+        b_0 = 1
+        b_1 = 1
         if layer_b0 == "X":
-            b_0  = 2*self.b
-            b_1 = 2*self.a
+            # b_0 = 2*self.b
+            # b_1 = 2*self.a
             self.bot_layer_0 = layer_b0
             self.bot_layer_1 = "Y"
             self.M_Ed_0  = self.moments[0]
             self.M_Ed_1 = self.moments[1]
         elif layer_b0 == "Y":
-            b_0 = 2*self.a
-            b_1 = 2*self.b
+            # b_0 = 2*self.a
+            # b_1 = 2*self.b
             self.bot_layer_0 = layer_b0
             self.bot_layer_1 = "X"
             self.M_Ed_0  = self.moments[1]
@@ -293,12 +295,13 @@ class Element:
             x_b_0 = d_0 - (d_0**2 - ( self.M_Ed_0 / (0.5*b_0*f_cd*1e6) ))**(1/2)
             x_0 = x_b_0/0.8
             if x_0 >= x_lim_0:
-                print("x is greater then x_lim -> Aborting computation")
-                quit()
-            self.As_req_b_0 = (x_b_0 * b_0 * f_cd) / f_yd
+                print("x is greater then x_lim")
+                self.As_b_0 = 0.0099
+            else:
+                self.As_req_b_0 = (x_b_0 * b_0 * f_cd) / f_yd
+                self.As_b_0 = max( self.As_min_b_0 , self.As_req_b_0 )
         else:
-            self.As_req_b_0 = 0
-        self.As_b_0 = max( self.As_min_b_0 , self.As_req_b_0 )
+            self.As_b_0 = self.As_min_b_0
 
         # Second layer
         d_1 = h_ - (self.c_b + (0.5*self.d_b_0+self.d_b_1)*0.001)
@@ -310,14 +313,95 @@ class Element:
             x_b_1 = d_1 - (d_1**2 - ( self.M_Ed_1 / (0.5*b_1*f_cd*1e6) ))**(1/2)
             x_1 = x_b_1/0.8
             if x_1 >= x_lim_1:
-                print("x is greater then x_lim -> Aborting computation")
-                quit()
-            self.As_req_b_1 = (x_b_1 * b_1 * f_cd) / f_yd
+                print("x is greater then x_lim")
+                self.As_b_1 = 0.0099
+            else:
+                self.As_req_b_1 = (x_b_1 * b_1 * f_cd) / f_yd
+                self.As_b_1 = max( self.As_min_b_1 , self.As_req_b_1 )
         else:
-            self.As_req_b_1 = 0
-        self.As_b_1 = max( self.As_min_b_1 , self.As_req_b_1 )
+            self.As_b_1 = self.As_min_b_1
 
 
+    def get_top_rebar(self, layer_t0="X", d_t0=10, d_t1=12, c_n=None):
+        """Takes argument layer_b0 as a first layer of rebar at the top of slab.
+
+            Arg:
+                layer_t0:   Direction of the first layer of rebars placed at the top of the slab.
+                            Input must be string X or Y
+                d_t0:       Diameter of the rebar - first layer
+                            Input in milimeters [mm]
+                d_t1:       Diameter of the rebar - second layer
+                            Input in milimeters [mm]
+
+            Optional Arg:
+                c_n:      Concrete reinforcement cover layer
+                            Direct input in milimeters or cumputed based on EN if left void.
+        """
+        b_0 = 1
+        b_1 = 1
+        if layer_t0 == "X":
+            # b_0 = 2*self.b
+            # b_1 = 2*self.a
+            self.top_layer_0 = layer_t0
+            self.top_layer_1 = "Y"
+            self.M_Ed_0 = self.moments[0]
+            self.M_Ed_1 = self.moments[1]
+        elif layer_t0 == "Y":
+            # b_0 = 2*self.a
+            # b_1 = 2*self.b
+            self.top_layer_0 = layer_t0
+            self.top_layer_1 = "X"
+            self.M_Ed_0 = self.moments[1]
+            self.M_Ed_1 = self.moments[0]
+        else:
+            print("Non valid direction of botom first layer -> Aborting computation")
+            quit()
+        self.d_t_0 = d_t0
+        self.d_t_1 = d_t1
+        if c_n:
+            self.c_t = c_n / 1000
+        else:
+            if self.d_t_0%5 == 0:
+                self.c_t = ( ((self.d_t_0//5+0)*5) + 10) / 1000
+            else:
+                self.c_t = ( ((self.d_t_0//5+1)*5) + 10) / 1000
+        h_ = self.h
+        d_0 = h_ - (self.c_t + 0.5*self.d_t_0*0.001)
+        As_min_0 = 0.26 * (f_ctm/f_yk) * b_0 * d_0
+        As_min_1 = 0.0013 * b_0 * d_0
+        self.As_min_t_0 = max(As_min_0, As_min_1)
+
+        # First layer
+        x_lim_0 = (700*d_0)/(700+f_yd)
+        if self.M_Ed_0 < 0:
+            x_t_0 = d_0 - (d_0**2 - ( abs(self.M_Ed_0) / (0.5*b_0*f_cd*1e6) ))**(1/2)
+            x_0 = x_t_0/0.8
+            if x_0 >= x_lim_0:
+                print("x is greater then x_lim")
+                self.As_t_1 = 0.0099
+            else:
+                self.As_req_t_0 = (x_t_0 * b_0 * f_cd) / f_yd
+                self.As_t_0 = max( self.As_min_t_0 , self.As_req_t_0 )
+        else:
+            self.As_t_0 = 0
+
+        # Second layer
+        d_1 = h_ - (self.c_t + (0.5*self.d_t_0+self.d_t_1)*0.001)
+        As_min_0 = 0.26 * (f_ctm/f_yk) * b_1 * d_1
+        As_min_1 = 0.0013 * b_1 * d_1
+        self.As_min_t_1 = max(As_min_0, As_min_1)
+        x_lim_1 = (700*d_1)/(700+f_yd)
+        if self.M_Ed_1 < 0:
+            x_t_1 = d_1 - (d_1**2 - ( abs(self.M_Ed_1) / (0.5*b_1*f_cd*1e6) ))**(1/2)
+            x_1 = x_t_1/0.8
+            if x_1 >= x_lim_1:
+                print("x is greater then x_lim")
+                self.As_t_1 = 0.0099
+            else:
+                self.As_req_t_1 = (x_t_1 * b_1 * f_cd) / f_yd
+                self.As_t_1 = max( self.As_min_t_1 , self.As_req_t_1 )
+        else:
+            self.As_t_1 = 0
 
 
 # Definition of construction
@@ -327,7 +411,7 @@ LY = 9
 
 
 
-mesh = .5
+mesh = .25
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)
@@ -357,7 +441,7 @@ for i in range(ny):
         n1 = Nodes_[i+1][j+1]
         n2 = Nodes_[i][j+1]
         n3 = Nodes_[i][j]
-        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.200, E = E_cm*1e9, mi=0.25) )
+        l_elems.append( Element(l_nodes[n0], l_nodes[n1], l_nodes[n2], l_nodes[n3], h = 0.200, E = E_cm*1e9, mi=0.2) )
 
 ## LOAD CASES
 
@@ -420,6 +504,10 @@ for i in l_nodes:
         boundary.append(i.w)
     if i.co_y == LY/2 and i.co_x <= LX/2:
         boundary.append(i.w)
+    # if i.co_y == LY/2:
+    #     boundary.append(i.w)
+    if i.co_x == LX and i.co_y <= 0.5*LY:
+        boundary.append(i.w)
 
     # if i.co_x == 0.5 and i.co_y == 0.5:
     #     boundary.append(i.w)
@@ -478,8 +566,10 @@ for i in l_elems:
     i.get_internal_forces(code_nums, r_tot)
 
 for i in l_elems:
-    i.get_bottom_rebar_0(layer_b0="X", d_b0=10, c_n=None)
+    i.get_bot_rebar(layer_b0="X", d_b0=10, d_b1=12, c_n=None)
 
+for i in l_elems:
+    i.get_top_rebar(layer_t0="X", d_t0=10, d_t1=12, c_n=None)
 
 
 #
@@ -489,18 +579,30 @@ x = np.arange(0+0.5*mesh, LX, mesh)
 y = np.arange(0+0.5*mesh, LY, mesh)
 X, Y = np.meshgrid(x, y)
 Z = np.zeros(np.shape(X))
-A0 = np.zeros(np.shape(X))
-A1 = np.zeros(np.shape(X))
+A_b_0 = np.zeros(np.shape(X))
+A_b_1 = np.zeros(np.shape(X))
+A_t_0 = np.zeros(np.shape(X))
+A_t_1 = np.zeros(np.shape(X))
 
 cunt = 0
 for i in range(len(Z)):
     for j in range(len(Z[0])):
         Z[i,j] = int(l_elems[cunt].moments[0])
-        A0[i,j] = l_elems[cunt].As_b_0 * 1e4
-        A1[i,j] = l_elems[cunt].As_b_1 * 1e4
+        A_t_0[i,j] = l_elems[cunt].As_t_0 * 1e4
+        A_t_1[i,j] = l_elems[cunt].As_t_1 * 1e4
+        A_b_0[i,j] = l_elems[cunt].As_b_0 * 1e4
+        A_b_1[i,j] = l_elems[cunt].As_b_1 * 1e4
         cunt +=1
-print(A0)
-print(A1)
+
+# print("Top_0")
+# print(A_t_0)
+# print("Top_1")
+# print(A_t_1)
+#
+# print("Bot_0")
+# print(A_b_0)
+# print("Bot_1")
+# print(A_b_1)
 
 red_r_tot  = []
 red_c_nums = []
@@ -595,7 +697,7 @@ if _3D:
     plt.show()
 
 
-_2D = 0
+_2D = 1
 if _2D:
     import matplotlib.pyplot as plt
 
@@ -615,7 +717,8 @@ if _2D:
     cunt = 0
     for i in range(len(Z)):
         for j in range(len(Z[0])):
-            Z[i,j] = l_elems[cunt].moments[2]
+            # Z[i,j] = l_elems[cunt].moments[2]
+            Z[i,j] = l_elems[cunt].As_t_1
             cunt +=1
 
     plt.contour(X, Y, Z)
