@@ -1,5 +1,7 @@
 import numpy as np
 
+st1 = timeit.default_timer()
+
 np.set_printoptions(precision=1)
 
 spiel = 1
@@ -373,6 +375,8 @@ for i in range(len(r_tot)):
 for i in l_elems:
     i.get_internal_forces(code_nums, r_tot)
 
+st2 = timeit.default_timer()
+print(st2-st1)
 
 _3D = 1
 if _3D:
