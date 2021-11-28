@@ -406,12 +406,12 @@ class Element:
 
 # Definition of construction
 
-LX = 6
-LY = 9
+LX = 4
+LY = 6
 
 
 
-mesh = .25
+mesh = .75
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)

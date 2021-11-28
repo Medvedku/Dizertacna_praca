@@ -13,7 +13,7 @@ gamma_c = 1.5
 
 ## USED MATERIALS:
 #  Concrete
-concrete = "C30/37"
+concrete = "C20/25"
 filt_c = (d_con["Class"]==concrete)
 f_ck   = d_con.loc[filt_c, "f_ck"].values[0]
 f_cd   = f_ck / gamma_c
@@ -295,12 +295,13 @@ class Element:
             x_b_0 = d_0 - (d_0**2 - ( self.M_Ed_0 / (0.5*b_0*f_cd*1e6) ))**(1/2)
             x_0 = x_b_0/0.8
             if x_0 >= x_lim_0:
-                print("x is greater then x_lim -> Aborting computation")
-                quit()
-            self.As_req_b_0 = (x_b_0 * b_0 * f_cd) / f_yd
+                print("x is greater then x_lim")
+                self.As_b_0 = 0.0099
+            else:
+                self.As_req_b_0 = (x_b_0 * b_0 * f_cd) / f_yd
+                self.As_b_0 = max( self.As_min_b_0 , self.As_req_b_0 )
         else:
-            self.As_req_b_0 = 0
-        self.As_b_0 = max( self.As_min_b_0 , self.As_req_b_0 )
+            self.As_b_0 = self.As_min_b_0
 
         # Second layer
         d_1 = h_ - (self.c_b + (0.5*self.d_b_0+self.d_b_1)*0.001)
@@ -312,12 +313,13 @@ class Element:
             x_b_1 = d_1 - (d_1**2 - ( self.M_Ed_1 / (0.5*b_1*f_cd*1e6) ))**(1/2)
             x_1 = x_b_1/0.8
             if x_1 >= x_lim_1:
-                print("x is greater then x_lim -> Aborting computation")
-                quit()
-            self.As_req_b_1 = (x_b_1 * b_1 * f_cd) / f_yd
+                print("x is greater then x_lim")
+                self.As_b_1 = 0.0099
+            else:
+                self.As_req_b_1 = (x_b_1 * b_1 * f_cd) / f_yd
+                self.As_b_1 = max( self.As_min_b_1 , self.As_req_b_1 )
         else:
-            self.As_req_b_1 = 0
-        self.As_b_1 = max( self.As_min_b_1 , self.As_req_b_1 )
+            self.As_b_1 = self.As_min_b_1
 
 
     def get_top_rebar(self, layer_t0="X", d_t0=10, d_t1=12, c_n=None):
@@ -375,7 +377,7 @@ class Element:
             x_t_0 = d_0 - (d_0**2 - ( abs(self.M_Ed_0) / (0.5*b_0*f_cd*1e6) ))**(1/2)
             x_0 = x_t_0/0.8
             if x_0 >= x_lim_0:
-                print("x is greater then x_lim -> Aborting computation")
+                print("x is greater then x_lim")
                 self.As_t_1 = 0.0099
             else:
                 self.As_req_t_0 = (x_t_0 * b_0 * f_cd) / f_yd
@@ -393,7 +395,7 @@ class Element:
             x_t_1 = d_1 - (d_1**2 - ( abs(self.M_Ed_1) / (0.5*b_1*f_cd*1e6) ))**(1/2)
             x_1 = x_t_1/0.8
             if x_1 >= x_lim_1:
-                print("x is greater then x_lim -> Aborting computation")
+                print("x is greater then x_lim")
                 self.As_t_1 = 0.0099
             else:
                 self.As_req_t_1 = (x_t_1 * b_1 * f_cd) / f_yd
@@ -409,7 +411,7 @@ LY = 9
 
 
 
-mesh = .5
+mesh = .25
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)
@@ -502,6 +504,10 @@ for i in l_nodes:
         boundary.append(i.w)
     if i.co_y == LY/2 and i.co_x <= LX/2:
         boundary.append(i.w)
+    # if i.co_y == LY/2:
+    #     boundary.append(i.w)
+    if i.co_x == LX and i.co_y <= 0.5*LY:
+        boundary.append(i.w)
 
     # if i.co_x == 0.5 and i.co_y == 0.5:
     #     boundary.append(i.w)
@@ -587,15 +593,16 @@ for i in range(len(Z)):
         A_b_0[i,j] = l_elems[cunt].As_b_0 * 1e4
         A_b_1[i,j] = l_elems[cunt].As_b_1 * 1e4
         cunt +=1
+
 # print("Top_0")
 # print(A_t_0)
 # print("Top_1")
 # print(A_t_1)
-
-print("Bot_0")
-print(A_b_0)
-print("Bot_1")
-print(A_b_1)
+#
+# print("Bot_0")
+# print(A_b_0)
+# print("Bot_1")
+# print(A_b_1)
 
 red_r_tot  = []
 red_c_nums = []
@@ -608,6 +615,10 @@ r_max = max(red_r_tot)
 r_min = min(red_r_tot)
 c_n_max = red_c_nums[red_r_tot.index(r_max)]
 c_n_min = red_c_nums[red_r_tot.index(r_min)]
+
+
+# _plot = 1
+# if _plot:
 
 
 _3D = 0
@@ -690,34 +701,73 @@ if _3D:
     plt.show()
 
 
-_2D = 0
+_2D = 1
 if _2D:
     import matplotlib.pyplot as plt
+    from matplotlib import gridspec as grd
+    # plt.style.use("seaborn")
+    scale = 11.5/min(LX,LY)
+    plt.figure(figsize=(2*LX/scale,2*LY/scale))
+    G = grd.GridSpec(2,2)
 
     X = [0, LX, LX, 0 , 0]
     Y = [0, 0,  LY, LY, 0]
-    fig = plt.figure(figsize=(LX, LY))
-    plt.plot(X, Y, linewidth=0.5)
+    # fig0, ax0 = plt.subplots(figsize=(LX, LY))
+    ax0 = plt.subplot(G[0, 0])
+    ax0.plot(X, Y, linewidth=0.5)
+
+    # fig1, ax1 = plt.subplots(figsize=(LX, LY))
+    ax1 = plt.subplot(G[0, 1])
+    ax1.plot(X, Y, linewidth=0.5)
+
+    # fig2, ax2 = plt.subplots(figsize=(LX, LY))
+    ax2 = plt.subplot(G[1, 0])
+    ax2.plot(X, Y, linewidth=0.5)
+
+    # fig3, ax3 = plt.subplots(figsize=(LX, LY))
+    ax3 = plt.subplot(G[1, 1])
+    ax3.plot(X, Y, linewidth=0.5)
 
     for i in deleto:
-        plt.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+        ax0.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+        ax1.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+        ax2.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+        ax3.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
 
     x = np.arange(0+0.5*mesh, LX, mesh)
     y = np.arange(0+0.5*mesh, LY, mesh)
     X, Y = np.meshgrid(x, y)
-    Z = np.zeros(np.shape(X))
+    Z0 = np.zeros(np.shape(X))
+    Z1 = np.zeros(np.shape(X))
+    Z2 = np.zeros(np.shape(X))
+    Z3 = np.zeros(np.shape(X))
 
     cunt = 0
     for i in range(len(Z)):
         for j in range(len(Z[0])):
-            Z[i,j] = l_elems[cunt].moments[2]
+            # Z[i,j] = l_elems[cunt].moments[2]
+            Z0[i,j] = l_elems[cunt].As_b_0
+            Z1[i,j] = l_elems[cunt].As_b_1
+            Z2[i,j] = l_elems[cunt].As_t_0
+            Z3[i,j] = l_elems[cunt].As_t_1
             cunt +=1
 
-    plt.contour(X, Y, Z)
+    ax0.contour(X, Y, Z0)
+    ax1.contour(X, Y, Z1)
+    ax2.contour(X, Y, Z2)
+    ax3.contour(X, Y, Z3)
     # ax.clabel(CS, inline=True, fontsize=5)
 
-    plt.title('A Basic Line Plot')
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
+    bot_0 = l_elems[0].bot_layer_0
+    bot_1 = l_elems[0].bot_layer_1
+    top_0 = l_elems[0].top_layer_0
+    top_1 = l_elems[0].top_layer_1
+
+    ax0.set_title('As bottom - first layer '+ l_elems[0].bot_layer_0)
+    ax1.set_title('As bottom - second layer '+ l_elems[0].bot_layer_1)
+    ax2.set_title('As top - first layer '+ l_elems[0].top_layer_0)
+    ax3.set_title('As top - second layer '+ l_elems[0].top_layer_1)
+    # ax0.set_xlabel('X-axis')
+    # ax0.set_ylabel('Y-axis')
 
     plt.show()
