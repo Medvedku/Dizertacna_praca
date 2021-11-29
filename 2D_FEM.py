@@ -318,15 +318,15 @@ class Element:
             # b_1 = 2*self.a
             self.bot_layer_0 = layer_b0
             self.bot_layer_1 = "Y"
-            self.M_Ed_0_b = self.moments[0]
-            self.M_Ed_1_b = self.moments[1]
+            self.M_Ed_0_b = self.M_x_bot
+            self.M_Ed_1_b = self.M_y_bot
         elif layer_b0 == "Y":
             # b_0 = 2*self.a
             # b_1 = 2*self.b
             self.bot_layer_0 = layer_b0
             self.bot_layer_1 = "X"
-            self.M_Ed_0_b = self.moments[1]
-            self.M_Ed_1_b = self.moments[0]
+            self.M_Ed_0_b = self.M_y_bot
+            self.M_Ed_1_b = self.M_x_bot
         else:
             print("Non valid direction of botom first layer -> Aborting computation")
             quit()
@@ -400,15 +400,15 @@ class Element:
             # b_1 = 2*self.a
             self.top_layer_0 = layer_t0
             self.top_layer_1 = "Y"
-            self.M_Ed_0_t = self.moments[0]
-            self.M_Ed_1_t = self.moments[1]
+            self.M_Ed_0_t = self.M_x_bot
+            self.M_Ed_1_t = self.M_y_bot
         elif layer_t0 == "Y":
             # b_0 = 2*self.a
             # b_1 = 2*self.b
             self.top_layer_0 = layer_t0
             self.top_layer_1 = "X"
-            self.M_Ed_0_t = self.moments[1]
-            self.M_Ed_1_t = self.moments[0]
+            self.M_Ed_0_t = self.M_y_bot
+            self.M_Ed_1_t = self.M_x_bot
         else:
             print("Non valid direction of botom first layer -> Aborting computation")
             quit()
@@ -462,8 +462,8 @@ class Element:
 
 # Definition of construction
 
-LX = 5
-LY = 5
+LX = 6
+LY = 6
 
 
 mesh = .5
