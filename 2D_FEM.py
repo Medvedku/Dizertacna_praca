@@ -400,15 +400,15 @@ class Element:
             # b_1 = 2*self.a
             self.top_layer_0 = layer_t0
             self.top_layer_1 = "Y"
-            self.M_Ed_0_t = self.M_x_bot
-            self.M_Ed_1_t = self.M_y_bot
+            self.M_Ed_0_t = self.M_x_top
+            self.M_Ed_1_t = self.M_y_top
         elif layer_t0 == "Y":
             # b_0 = 2*self.a
             # b_1 = 2*self.b
             self.top_layer_0 = layer_t0
             self.top_layer_1 = "X"
-            self.M_Ed_0_t = self.M_y_bot
-            self.M_Ed_1_t = self.M_x_bot
+            self.M_Ed_0_t = self.M_y_top
+            self.M_Ed_1_t = self.M_x_top
         else:
             print("Non valid direction of botom first layer -> Aborting computation")
             quit()
@@ -462,11 +462,11 @@ class Element:
 
 # Definition of construction
 
-LX = 6
-LY = 6
+LX = 5
+LY = 9
 
 
-mesh = .5
+mesh = .25
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)
@@ -559,6 +559,8 @@ for i in l_nodes:
         boundary.append(i.w)
     if i.co_y == LY:
         boundary.append(i.w)
+    if i.co_y == (5/9)*LY:
+        boundary.append(i.w)
 deleto = boundary
 
 
@@ -648,25 +650,75 @@ print("Bot_0", bot_0)
 print(A_b_0)
 print("Bot_1", bot_1)
 print(A_b_1)
+#
+# print("M_Ed Top_0", top_0)
+# print(M_t_0)
+# print("M_Ed Top_1", top_1)
+# print(M_t_1)
+#
+# print("M_Ed Bot_0", top_0)
+# print(M_b_0)
+# print("M_Ed Bot_1", top_1)
+# print(M_b_1)
+#
+# print("M_x")
+# print(mx*0.001)
+# print("M_y")
+# print(my*0.001)
+# print("M_xy")
+# print(mxy*0.001)
+
+As_min_b_0 = l_elems[0].As_min_b_0
+As_min_b_1 = l_elems[0].As_min_b_1
+As_min_t_0 = l_elems[0].As_min_t_0
+As_min_t_1 = l_elems[0].As_min_t_1
+
+s_b_0_req = 1 / ((As_min_b_0*1e4) / (((l_elems[0].d_b_0**2)*np.pi/4)*1e-2))
+s_b_1_req = 1 / ((As_min_b_1*1e4) / (((l_elems[0].d_b_1**2)*np.pi/4)*1e-2))
+s_t_0_req = 1 / ((As_min_t_0*1e4) / (((l_elems[0].d_t_0**2)*np.pi/4)*1e-2))
+s_t_1_req = 1 / ((As_min_t_1*1e4) / (((l_elems[0].d_t_1**2)*np.pi/4)*1e-2))
+
+s_b_0_prov = int(s_b_0_req*100)/100
+s_b_1_prov = int(s_b_1_req*100)/100
+s_t_0_prov = int(s_t_0_req*100)/100
+s_t_1_prov = int(s_t_1_req*100)/100
+
+As_0_b_0 = (1/s_b_0_prov) * (((l_elems[0].d_b_0**2)*np.pi/4)*1e-2)
+As_0_b_1 = (1/s_b_1_prov) * (((l_elems[0].d_b_1**2)*np.pi/4)*1e-2)
+As_0_t_0 = (1/s_t_0_prov) * (((l_elems[0].d_t_0**2)*np.pi/4)*1e-2)
+As_0_t_1 = (1/s_t_1_prov) * (((l_elems[0].d_t_1**2)*np.pi/4)*1e-2)
 
 
+l_A_b_0 = [0, As_0_b_0]
+l_A_b_1 = [0, As_0_b_1]
+l_A_t_0 = [0, As_0_t_0]
+l_A_t_1 = [0, As_0_t_1]
 
-print("M_Ed Top_0", top_0)
-print(M_t_0)
-print("M_Ed Top_1", top_1)
-print(M_t_1)
+cunt = 0
+while l_A_b_0[-1] < np.max(A_b_0):
+    l_A_b_0.append( l_A_b_0[1] + (cunt+1) * (((l_elems[0].d_b_0**2)*np.pi/4)*1e-2) )
+    cunt += 1
 
-print("M_Ed Bot_0", top_0)
-print(M_b_0)
-print("M_Ed Bot_1", top_1)
-print(M_b_1)
+cunt = 0
+while l_A_b_1[-1] < np.max(A_b_1):
+    l_A_b_1.append( l_A_b_1[1] + (cunt+1) * (((l_elems[0].d_b_1**2)*np.pi/4)*1e-2) )
+    cunt += 1
 
-print("M_x")
-print(mx*0.001)
-print("M_y")
-print(my*0.001)
-print("M_xy")
-print(mxy*0.001)
+cunt = 0
+while l_A_t_0[-1] < np.max(A_t_0):
+    l_A_t_0.append( l_A_t_0[1] + (cunt+1) * (((l_elems[0].d_t_0**2)*np.pi/4)*1e-2) )
+    cunt += 1
+
+cunt = 0
+while l_A_t_1[-1] < np.max(A_t_1):
+    l_A_t_1.append( l_A_t_1[1] + (cunt+1) * (((l_elems[0].d_t_1**2)*np.pi/4)*1e-2) )
+    cunt += 1
+
+
+# print(l_A_b_0)
+# print(l_A_b_1)
+# print(l_A_t_0)
+# print(l_A_t_1)
 
 
 red_r_tot  = []
@@ -678,6 +730,7 @@ for i in range(len(code_nums)):
 
 r_max = max(red_r_tot)
 r_min = min(red_r_tot)
+
 c_n_max = red_c_nums[red_r_tot.index(r_max)]
 c_n_min = red_c_nums[red_r_tot.index(r_min)]
 
@@ -761,13 +814,13 @@ if _3D:
 
     plt.show()
 
-_2D = 0
+_2D = 1
 if _2D:
     import matplotlib.pyplot as plt
     from matplotlib import gridspec as grd
     # plt.style.use("seaborn")
-    scale = 11.5/min(LX,LY)
-    plt.figure(figsize=(2*LX/scale,2*LY/scale))
+    scale = 11.5/max(LX,LY)/2
+    plt.figure(figsize=(2*LX*scale,2*LY*scale))
     G = grd.GridSpec(2,2)
 
     X = [0, LX, LX, 0 , 0]
@@ -806,16 +859,16 @@ if _2D:
     for i in range(len(Z)):
         for j in range(len(Z[0])):
             # Z[i,j] = l_elems[cunt].moments[2]
-            Z0[i,j] = l_elems[cunt].As_b_0
-            Z1[i,j] = l_elems[cunt].As_b_1
-            Z2[i,j] = l_elems[cunt].As_t_0
-            Z3[i,j] = l_elems[cunt].As_t_1
+            Z0[i,j] = l_elems[cunt].As_b_0 * 1e4
+            Z1[i,j] = l_elems[cunt].As_b_1 * 1e4
+            Z2[i,j] = l_elems[cunt].As_t_0 * 1e4
+            Z3[i,j] = l_elems[cunt].As_t_1 * 1e4
             cunt +=1
 
-    ax0.contour(X, Y, Z0)
-    ax1.contour(X, Y, Z1)
-    ax2.contour(X, Y, Z2)
-    ax3.contour(X, Y, Z3)
+    ax0.contour(X, Y, Z0, levels=l_A_b_0)
+    ax1.contour(X, Y, Z1, levels=l_A_b_1)
+    ax2.contour(X, Y, Z2, levels=l_A_t_0)
+    ax3.contour(X, Y, Z3, levels=l_A_t_1)
     # ax.clabel(CS, inline=True, fontsize=5)
 
     bot_0 = l_elems[0].bot_layer_0
@@ -830,16 +883,17 @@ if _2D:
     # ax0.set_xlabel('X-axis')
     # ax0.set_ylabel('Y-axis')
 
+    # plt.savefig("As2.eps")
     plt.show()
 
 
-_2D_M = 1
+_2D_M = 0
 if _2D_M:
     import matplotlib.pyplot as plt
     from matplotlib import gridspec as grd
     # plt.style.use("seaborn")
-    scale = 11.5/min(LX,LY)
-    plt.figure(figsize=(2*LX/scale,2*LY/scale))
+    scale = 11.5/max(LX,LY)/2
+    plt.figure(figsize=(2*LX*scale,2*LY*scale))
     G = grd.GridSpec(2,2)
 
     X = [0, LX, LX, 0 , 0]
@@ -895,10 +949,10 @@ if _2D_M:
     top_0 = l_elems[0].top_layer_0
     top_1 = l_elems[0].top_layer_1
 
-    ax0.set_title('As bottom - first layer '+ l_elems[0].bot_layer_0)
-    ax1.set_title('As bottom - second layer '+ l_elems[0].bot_layer_1)
-    ax2.set_title('As top - first layer '+ l_elems[0].top_layer_0)
-    ax3.set_title('As top - second layer '+ l_elems[0].top_layer_1)
+    ax0.set_title("M_x_bot")
+    ax1.set_title("M_y_bot")
+    ax2.set_title("M_x_top")
+    ax3.set_title("M_y_top")
     # ax0.set_xlabel('X-axis')
     # ax0.set_ylabel('Y-axis')
 
