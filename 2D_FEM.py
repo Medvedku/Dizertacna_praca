@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-np.set_printoptions(precision=2)
+np.set_printoptions(precision=1)
 
 spiel = 0
 
@@ -214,12 +214,23 @@ class Element:
         return b_matrix
 
     def get_load_vector(self, q):
+        """Computes load vector from surface load for each element. Can be called multiple times
+            Arg:
+                q:       Value of surface load in [N/m^2].    [constant]
+        """
         a = self.a
         b = self.b
         q = 4*q*a*b * np.array([1/4, a/12, b/12, 1/4, -a/12, b/12, 1/4, -a/12, -b/12, 1/4, a/12, -b/12])
         self.e_loads.append(q)
 
     def get_internal_forces(self, c_n, r_t):
+        """Computes internal forces (bending moments) at the centre of element.
+        Also computes design internal forces.
+
+            Arg:
+                c_n:       Reduced list of code numbers.    [list]
+                r_t:       Reduced vector of deformations.  [list]
+        """
         a = []
         for i in range(12):
             if (self.vec[i] in c_n):
@@ -239,6 +250,51 @@ class Element:
             stress += d_mtrx @ self.b_mat[i] @ a
 
         self.moments = stress/4
+
+        self.m_x  = self.moments[0]
+        self.m_y  = self.moments[1]
+        self.m_xy = -self.moments[2]
+
+        m_x = self.m_x
+        m_y = self.m_y
+        m_xy = self.m_xy
+
+        if m_x >= -abs(m_xy):
+            m_x_bot = m_x + abs(m_xy)
+            m_y_bot = m_y + abs(m_xy)
+            self.m_c_bot = - 2 * abs(m_xy)
+        else:
+            m_x_bot = 0
+            # m_y_bot = m_y + (m_xy**2)/(abs(m_x))
+            m_y_bot = 0
+            self.m_c_bot = -abs(m_x)*(1+(m_xy/m_x)**2)
+
+        if m_y <= abs(m_xy):
+            m_x_top = m_x - abs(m_xy)
+            m_y_top = m_y - abs(m_xy)
+            self.m_c_top = -2 * abs(m_xy)
+        else:
+            # m_x_top = -m_x + (m_xy**2)/(abs(m_y))
+            m_x_top = 0
+            m_y_top = 0
+            self.m_c_top = -abs(m_y)*(1+((m_xy/m_y)**2))
+
+        if m_x_bot > 0:
+            self.M_x_bot = m_x_bot
+        else:
+            self.M_x_bot = 0
+        if m_y_bot > 0:
+            self.M_y_bot = m_y_bot
+        else:
+            self.M_y_bot = 0
+        if m_x_top < 0:
+            self.M_x_top = m_x_top
+        else:
+            self.M_x_top = 0
+        if m_y_top < 0:
+            self.M_y_top = m_y_top
+        else:
+            self.M_y_top = 0
 
     def get_bot_rebar(self, layer_b0="X", d_b0=10, d_b1=12, c_n=None):
         """Takes argument layer_b0 as a first layer of rebar at the bottom of slab.
@@ -262,15 +318,15 @@ class Element:
             # b_1 = 2*self.a
             self.bot_layer_0 = layer_b0
             self.bot_layer_1 = "Y"
-            self.M_Ed_0  = self.moments[0]
-            self.M_Ed_1 = self.moments[1]
+            self.M_Ed_0_b = self.moments[0]
+            self.M_Ed_1_b = self.moments[1]
         elif layer_b0 == "Y":
             # b_0 = 2*self.a
             # b_1 = 2*self.b
             self.bot_layer_0 = layer_b0
             self.bot_layer_1 = "X"
-            self.M_Ed_0  = self.moments[1]
-            self.M_Ed_1 = self.moments[0]
+            self.M_Ed_0_b = self.moments[1]
+            self.M_Ed_1_b = self.moments[0]
         else:
             print("Non valid direction of botom first layer -> Aborting computation")
             quit()
@@ -291,8 +347,8 @@ class Element:
 
         # First layer
         x_lim_0 = (700*d_0)/(700+f_yd)
-        if self.M_Ed_0 > 0:
-            x_b_0 = d_0 - (d_0**2 - ( self.M_Ed_0 / (0.5*b_0*f_cd*1e6) ))**(1/2)
+        if self.M_Ed_0_b > 0:
+            x_b_0 = d_0 - (d_0**2 - ( self.M_Ed_0_b / (0.5*b_0*f_cd*1e6) ))**(1/2)
             x_0 = x_b_0/0.8
             if x_0 >= x_lim_0:
                 print("x is greater then x_lim")
@@ -309,8 +365,8 @@ class Element:
         As_min_1 = 0.0013 * b_1 * d_1
         self.As_min_b_1 = max(As_min_0, As_min_1)
         x_lim_1 = (700*d_1)/(700+f_yd)
-        if self.M_Ed_1 > 0:
-            x_b_1 = d_1 - (d_1**2 - ( self.M_Ed_1 / (0.5*b_1*f_cd*1e6) ))**(1/2)
+        if self.M_Ed_1_b > 0:
+            x_b_1 = d_1 - (d_1**2 - ( self.M_Ed_1_b / (0.5*b_1*f_cd*1e6) ))**(1/2)
             x_1 = x_b_1/0.8
             if x_1 >= x_lim_1:
                 print("x is greater then x_lim")
@@ -344,15 +400,15 @@ class Element:
             # b_1 = 2*self.a
             self.top_layer_0 = layer_t0
             self.top_layer_1 = "Y"
-            self.M_Ed_0 = self.moments[0]
-            self.M_Ed_1 = self.moments[1]
+            self.M_Ed_0_t = self.moments[0]
+            self.M_Ed_1_t = self.moments[1]
         elif layer_t0 == "Y":
             # b_0 = 2*self.a
             # b_1 = 2*self.b
             self.top_layer_0 = layer_t0
             self.top_layer_1 = "X"
-            self.M_Ed_0 = self.moments[1]
-            self.M_Ed_1 = self.moments[0]
+            self.M_Ed_0_t = self.moments[1]
+            self.M_Ed_1_t = self.moments[0]
         else:
             print("Non valid direction of botom first layer -> Aborting computation")
             quit()
@@ -373,8 +429,8 @@ class Element:
 
         # First layer
         x_lim_0 = (700*d_0)/(700+f_yd)
-        if self.M_Ed_0 < 0:
-            x_t_0 = d_0 - (d_0**2 - ( abs(self.M_Ed_0) / (0.5*b_0*f_cd*1e6) ))**(1/2)
+        if self.M_Ed_0_t < 0:
+            x_t_0 = d_0 - (d_0**2 - ( abs(self.M_Ed_0_t) / (0.5*b_0*f_cd*1e6) ))**(1/2)
             x_0 = x_t_0/0.8
             if x_0 >= x_lim_0:
                 print("x is greater then x_lim")
@@ -391,8 +447,8 @@ class Element:
         As_min_1 = 0.0013 * b_1 * d_1
         self.As_min_t_1 = max(As_min_0, As_min_1)
         x_lim_1 = (700*d_1)/(700+f_yd)
-        if self.M_Ed_1 < 0:
-            x_t_1 = d_1 - (d_1**2 - ( abs(self.M_Ed_1) / (0.5*b_1*f_cd*1e6) ))**(1/2)
+        if self.M_Ed_1_t < 0:
+            x_t_1 = d_1 - (d_1**2 - ( abs(self.M_Ed_1_t) / (0.5*b_1*f_cd*1e6) ))**(1/2)
             x_1 = x_t_1/0.8
             if x_1 >= x_lim_1:
                 print("x is greater then x_lim")
@@ -410,7 +466,7 @@ LX = 6
 LY = 9
 
 
-mesh = .5
+mesh = .75
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)
@@ -553,10 +609,10 @@ for i in l_elems:
     i.get_internal_forces(code_nums, r_tot)
 
 for i in l_elems:
-    i.get_bot_rebar(layer_b0="X", d_b0=10, d_b1=12, c_n=None)
+    i.get_bot_rebar(layer_b0="X", d_b0=8, d_b1=8, c_n=None)
 
 for i in l_elems:
-    i.get_top_rebar(layer_t0="X", d_t0=10, d_t1=12, c_n=None)
+    i.get_top_rebar(layer_t0="X", d_t0=8, d_t1=8, c_n=None)
 
 
 #
@@ -571,6 +627,15 @@ A_b_1 = np.zeros(np.shape(X))
 A_t_0 = np.zeros(np.shape(X))
 A_t_1 = np.zeros(np.shape(X))
 
+M_b_0 = np.zeros(np.shape(X))
+M_b_1 = np.zeros(np.shape(X))
+M_t_0 = np.zeros(np.shape(X))
+M_t_1 = np.zeros(np.shape(X))
+
+mx  = np.zeros(np.shape(X))
+my  = np.zeros(np.shape(X))
+mxy = np.zeros(np.shape(X))
+
 cunt = 0
 for i in range(len(Z)):
     for j in range(len(Z[0])):
@@ -579,17 +644,50 @@ for i in range(len(Z)):
         A_t_1[i,j] = l_elems[cunt].As_t_1 * 1e4
         A_b_0[i,j] = l_elems[cunt].As_b_0 * 1e4
         A_b_1[i,j] = l_elems[cunt].As_b_1 * 1e4
+        M_t_0[i,j] = l_elems[cunt].M_x_top / 1000
+        M_t_1[i,j] = l_elems[cunt].M_y_top / 1000
+        M_b_0[i,j] = l_elems[cunt].M_x_bot / 1000
+        M_b_1[i,j] = l_elems[cunt].M_y_bot / 1000
+
+        mx[i,j]  = l_elems[cunt].m_x
+        my[i,j]  = l_elems[cunt].m_y
+        mxy[i,j] = l_elems[cunt].m_xy
         cunt +=1
 
-# print("Top_0")
-# print(A_t_0)
-# print("Top_1")
-# print(A_t_1)
-#
-# print("Bot_0")
-# print(A_b_0)
-# print("Bot_1")
-# print(A_b_1)
+bot_0 = l_elems[0].bot_layer_0
+bot_1 = l_elems[0].bot_layer_1
+top_0 = l_elems[0].top_layer_0
+top_1 = l_elems[0].top_layer_1
+
+print("Top_0", top_0)
+print(A_t_0)
+print("Top_1", top_1)
+print(A_t_1)
+
+print("Bot_0", bot_0)
+print(A_b_0)
+print("Bot_1", bot_1)
+print(A_b_1)
+
+
+
+print("M_Ed Top_0", top_0)
+print(M_t_0)
+print("M_Ed Top_1", top_1)
+print(M_t_1)
+
+print("M_Ed Bot_0", top_0)
+print(M_b_0)
+print("M_Ed Bot_1", top_1)
+print(M_b_1)
+
+print("M_x")
+print(mx*0.001)
+print("M_y")
+print(my*0.001)
+print("M_xy")
+print(mxy*0.001)
+
 
 red_r_tot  = []
 red_c_nums = []
@@ -602,10 +700,6 @@ r_max = max(red_r_tot)
 r_min = min(red_r_tot)
 c_n_max = red_c_nums[red_r_tot.index(r_max)]
 c_n_min = red_c_nums[red_r_tot.index(r_min)]
-
-
-# _plot = 1
-# if _plot:
 
 
 _3D = 0
@@ -688,7 +782,7 @@ if _3D:
     plt.show()
 
 
-_2D = 1
+_2D = 0
 if _2D:
     import matplotlib.pyplot as plt
     from matplotlib import gridspec as grd
