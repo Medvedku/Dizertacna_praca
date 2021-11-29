@@ -462,11 +462,11 @@ class Element:
 
 # Definition of construction
 
-LX = 6
-LY = 9
+LX = 5
+LY = 5
 
 
-mesh = .75
+mesh = .5
 
 nx = int(LX/mesh)
 ny = int(LY/mesh)
@@ -531,55 +531,35 @@ for e in l_elems:
 #         boundary.append(i.w)
 # deleto = boundary
 
-# # 4 Edges around
+# # Sample
 # boundary = []
 # for i in l_nodes:
-#     if i.co_x == 0:
+#     if i.co_x == 0 and i.co_y >= 0.5*LY:
 #         boundary.append(i.w)
-#     if i.co_x == LX:
+#     if i.co_x == LX and i.co_y == 0:
 #         boundary.append(i.w)
-#     if i.co_y == 0:
+#     if i.co_x == LX and i.co_y == LY:
 #         boundary.append(i.w)
-#     if i.co_y == LY:
+#     if i.co_x == 0 and i.co_y == 0:
+#         boundary.append(i.w)
+#     if i.co_y == LY/2 and i.co_x <= LX/2:
+#         boundary.append(i.w)
+#     if i.co_x == LX and i.co_y <= 0.5*LY:
 #         boundary.append(i.w)
 # deleto = boundary
 
-# 4 points around
+# 4 Edges around
 boundary = []
 for i in l_nodes:
-    # if i.co_x == 0 and i.co_y == LY:
+    if i.co_x == 0:
+        boundary.append(i.w)
+    # if i.co_x == LX:
     #     boundary.append(i.w)
-    if i.co_x == 0 and i.co_y >= 0.5*LY:
+    if i.co_y == 0:
         boundary.append(i.w)
-    if i.co_x == LX and i.co_y == 0:
+    if i.co_y == LY:
         boundary.append(i.w)
-    if i.co_x == LX and i.co_y == LY:
-        boundary.append(i.w)
-    if i.co_x == 0 and i.co_y == 0:
-        boundary.append(i.w)
-    if i.co_y == LY/2 and i.co_x <= LX/2:
-        boundary.append(i.w)
-    if i.co_x == LX and i.co_y <= 0.5*LY:
-        boundary.append(i.w)
-
 deleto = boundary
-
-# # 4 Edges around
-# boundary = []
-# for i in l_nodes:
-#     if i.co_x == 0:
-#         boundary.append(i.w)
-#     if i.co_x == LX:
-#         boundary.append(i.w)
-#     if i.co_y == 0:
-#         boundary.append(i.w)
-#     if i.co_y == LY:
-#         boundary.append(i.w)
-#     if i.co_y == LY/2:
-#         boundary.append(i.w)
-#     if i.co_x == LX/2:
-#         boundary.append(i.w)
-# deleto = boundary
 
 
 K_gl = np.zeros( (dofs, dofs) )
@@ -781,7 +761,6 @@ if _3D:
 
     plt.show()
 
-
 _2D = 0
 if _2D:
     import matplotlib.pyplot as plt
@@ -831,6 +810,78 @@ if _2D:
             Z1[i,j] = l_elems[cunt].As_b_1
             Z2[i,j] = l_elems[cunt].As_t_0
             Z3[i,j] = l_elems[cunt].As_t_1
+            cunt +=1
+
+    ax0.contour(X, Y, Z0)
+    ax1.contour(X, Y, Z1)
+    ax2.contour(X, Y, Z2)
+    ax3.contour(X, Y, Z3)
+    # ax.clabel(CS, inline=True, fontsize=5)
+
+    bot_0 = l_elems[0].bot_layer_0
+    bot_1 = l_elems[0].bot_layer_1
+    top_0 = l_elems[0].top_layer_0
+    top_1 = l_elems[0].top_layer_1
+
+    ax0.set_title('As bottom - first layer '+ l_elems[0].bot_layer_0)
+    ax1.set_title('As bottom - second layer '+ l_elems[0].bot_layer_1)
+    ax2.set_title('As top - first layer '+ l_elems[0].top_layer_0)
+    ax3.set_title('As top - second layer '+ l_elems[0].top_layer_1)
+    # ax0.set_xlabel('X-axis')
+    # ax0.set_ylabel('Y-axis')
+
+    plt.show()
+
+
+_2D_M = 1
+if _2D_M:
+    import matplotlib.pyplot as plt
+    from matplotlib import gridspec as grd
+    # plt.style.use("seaborn")
+    scale = 11.5/min(LX,LY)
+    plt.figure(figsize=(2*LX/scale,2*LY/scale))
+    G = grd.GridSpec(2,2)
+
+    X = [0, LX, LX, 0 , 0]
+    Y = [0, 0,  LY, LY, 0]
+    # fig0, ax0 = plt.subplots(figsize=(LX, LY))
+    ax0 = plt.subplot(G[0, 0])
+    ax0.plot(X, Y, linewidth=0.5)
+
+    # fig1, ax1 = plt.subplots(figsize=(LX, LY))
+    ax1 = plt.subplot(G[0, 1])
+    ax1.plot(X, Y, linewidth=0.5)
+
+    # fig2, ax2 = plt.subplots(figsize=(LX, LY))
+    ax2 = plt.subplot(G[1, 0])
+    ax2.plot(X, Y, linewidth=0.5)
+
+    # fig3, ax3 = plt.subplots(figsize=(LX, LY))
+    ax3 = plt.subplot(G[1, 1])
+    ax3.plot(X, Y, linewidth=0.5)
+
+    for i in deleto:
+        ax0.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+        ax1.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+        ax2.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+        ax3.plot([l_nodes[i//3].co_x], [l_nodes[i//3].co_y], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=1, alpha=1.)
+
+    x = np.arange(0+0.5*mesh, LX, mesh)
+    y = np.arange(0+0.5*mesh, LY, mesh)
+    X, Y = np.meshgrid(x, y)
+    Z0 = np.zeros(np.shape(X))
+    Z1 = np.zeros(np.shape(X))
+    Z2 = np.zeros(np.shape(X))
+    Z3 = np.zeros(np.shape(X))
+
+    cunt = 0
+    for i in range(len(Z)):
+        for j in range(len(Z[0])):
+            # Z[i,j] = l_elems[cunt].moments[2]
+            Z0[i,j] = l_elems[cunt].M_x_bot
+            Z1[i,j] = l_elems[cunt].M_y_bot
+            Z2[i,j] = l_elems[cunt].M_x_top
+            Z3[i,j] = l_elems[cunt].M_y_top
             cunt +=1
 
     ax0.contour(X, Y, Z0)
